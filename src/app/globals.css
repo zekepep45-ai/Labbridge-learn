@@ -374,3 +374,50 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 .danger-button:hover{background:#fff5f2}
 .assessment-item-actions{padding-top:8px;border-top:1px solid #edf1ed}
 .assessment-item-actions button:disabled{opacity:.45;cursor:not-allowed}
+
+
+/* Learner assessment analytics */
+.progress-page{min-height:100vh;background:#f8faf8;color:#294237;padding:0 clamp(16px,5vw,72px) 45px}
+.progress-page .admin-header{max-width:1120px;margin:auto}
+.progress-nav{display:flex;align-items:center;gap:18px}
+.progress-nav a{font-size:9px;color:#34734f;font-weight:800;text-decoration:none}
+.progress-hero{max-width:1120px;margin:48px auto 26px}
+.progress-hero h1{font:800 clamp(30px,4vw,46px)/1.12 Manrope;letter-spacing:-1.8px;color:#203b30;margin:12px 0}
+.progress-hero h1 em{font-style:normal;color:#6e9a7b}
+.progress-hero>p{font-size:11px;line-height:1.8;color:#78877f;max-width:650px}
+.progress-stat-grid{max-width:1120px;margin:0 auto 20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.progress-stat{padding:17px;background:#fff;border:1px solid #e5ece6;border-radius:10px;display:grid;gap:7px}
+.progress-stat>span{font-size:7px;letter-spacing:1.1px;font-weight:900;color:#8a9a8f}
+.progress-stat>strong{font:800 29px Manrope;color:#2c5940}
+.progress-stat>small{font-size:8px;color:#8a978e}
+.progress-content-grid{max-width:1120px;margin:auto;display:grid;grid-template-columns:1.45fr .85fr;gap:14px;align-items:start}
+.progress-panel{background:#fff;border:1px solid #e5ece6;border-radius:11px;padding:20px;min-width:0}
+.progress-panel h2{font:800 19px Manrope;color:#294438;margin:6px 0 13px}
+.progress-count{font-size:8px;color:#8b9a90}
+.progress-history{display:grid}
+.progress-history-row{display:flex;align-items:center;gap:11px;padding:13px 0;border-top:1px solid #edf1ed}
+.progress-history-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#edf5ef;color:#34734f;font-weight:900;flex:0 0 30px}
+.progress-history-main{display:grid;gap:4px;min-width:0;flex:1}
+.progress-history-main strong{font-size:10px;color:#395646;overflow-wrap:anywhere}
+.progress-history-main small{font-size:8px;color:#8a978e;line-height:1.5}
+.progress-history-score{display:grid;gap:4px;text-align:right}
+.progress-history-score strong{font:800 16px Manrope;color:#315b42}
+.progress-history-score span{font-size:7px;font-weight:900;letter-spacing:.4px}
+.progress-history-score .passed{color:#368052}
+.progress-history-score .needs-work{color:#b17a4c}
+.progress-topic-intro{font-size:9px;line-height:1.7;color:#829087;margin:0 0 18px}
+.topic-performance{padding:12px 0;border-top:1px solid #edf1ed}
+.topic-performance>div:first-child{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}
+.topic-performance strong{font-size:9px;color:#536b5b}
+.topic-performance span{font-size:8px;color:#89978e;white-space:nowrap}
+.topic-performance .progress-track{height:6px;background:#edf2ee;border-radius:10px;overflow:hidden}
+.topic-performance .progress-track span{display:block;height:100%;background:#78a789;border-radius:10px}
+.progress-study-link{display:inline-block;margin-top:16px;font-size:9px;font-weight:900;color:#34734f;text-decoration:none}
+.progress-empty{padding:35px 12px;text-align:center;display:grid;justify-items:center;gap:9px}
+.progress-empty>span{font-size:25px;color:#79a488}
+.progress-empty h3{font:800 15px Manrope;margin:0;color:#3d5a48}
+.progress-empty p{max-width:320px;font-size:9px;line-height:1.7;color:#839087;margin:0}
+.progress-empty a{font-size:9px;font-weight:900;color:#34734f;text-decoration:none;margin-top:5px}
+.compact-empty{padding:18px 4px}
+@media(max-width:800px){.progress-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.progress-content-grid{grid-template-columns:1fr}.progress-hero{margin:34px auto 20px}.progress-panel{padding:16px}}
+@media(max-width:480px){.progress-page{padding:0 13px 30px}.progress-nav{gap:10px}.progress-nav a{font-size:8px}.progress-stat{padding:13px}.progress-stat>strong{font-size:25px}.progress-history-row{gap:8px}.progress-history-score strong{font-size:14px}}
