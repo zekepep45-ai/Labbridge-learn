@@ -1,0 +1,7 @@
+"use client";
+import {useEffect,useState} from "react";
+import Link from "next/link";
+export type OfflineLesson={id:string;title:string;summary:string|null;content_markdown:string|null;courseTitle:string;savedAt:string};
+const KEY="labbridge-offline-lessons-v1";
+function readSaved():OfflineLesson[]{try{return JSON.parse(localStorage.getItem(KEY)||"[]") as OfflineLesson[]}catch{return[]}}
+export default function OfflineLessonTools({lesson,courseTitle}:{lesson:Omit<OfflineLesson,"courseTitle"|"savedAt">;courseTitle:string}){const[saved,setSaved]=useState(false),[ready,setReady]=useState(false);useEffect(()=>{setSaved(readSaved().some(x=>x.id===lesson.id));setReady(true)},[lesson.id]);function toggle(){const list=readSaved();if(list.some(x=>x.id===lesson.id)){localStorage.setItem(KEY,JSON.stringify(list.filter(x=>x.id!==lesson.id)));setSaved(false);return}try{localStorage.setItem(KEY,JSON.stringify([...list,{...lesson,courseTitle,savedAt:new Date().toISOString()}]));setSaved(true)}catch{alert("Device storage is full. Remove an older saved lesson and try again.")}}return <div className="offline-lesson-tools"><button type="button" disabled={!ready||!lesson.content_markdown} onClick={toggle}>{saved?"✓ Saved offline · Remove":"↓ Save lesson for offline study"}</button><Link href="/offline">My offline lessons →</Link><small>Lesson text is stored in this browser on this device.</small></div>}
