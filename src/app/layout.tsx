@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import PwaRegistration from "@/components/PwaRegistration";
 
 export const metadata: Metadata = {
   title: "LabBridge Learn | Learn. Practice. Advance.",
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><PwaRegistration />{children}</body>
     </html>
   );
 }
