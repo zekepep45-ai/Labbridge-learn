@@ -97,7 +97,7 @@ export default function AcademicReviewPage() {
     <section className="admin-card academic-review-list">
       <div className="admin-card-head academic-review-head"><div><span>ACADEMIC REVIEW WORKFLOW</span><h2>Submission queue</h2></div><select value={filter} onChange={(e) => setFilter(e.target.value as "pending" | "all")}><option value="pending">Pending reviews</option><option value="all">All submissions</option></select></div>
       {message && <p className="admin-feedback" role="status">{message}</p>}
-      {visible.length === 0 ? <div className="academic-review-empty"><span>✓</span><h3>You're all caught up</h3><p>There are no submissions in this view. New academic submissions will appear here.</p></div> :
+      {visible.length === 0 ? <div className="academic-review-empty"><span>✓</span><h3>You&apos;re all caught up</h3><p>There are no submissions in this view. New academic submissions will appear here.</p></div> :
         <div className="academic-review-items">{visible.map((review) => <article className="academic-review-item" key={review.id}>
           <div className="academic-review-item-top"><span className="academic-review-type">{review.item_type.toUpperCase()}</span><span className={"academic-review-status status-" + review.status}>{review.status.replace("_", " ")}</span></div>
           <h3>{titles[review.item_id] || "Content item " + review.item_id.slice(0, 8)}</h3>
