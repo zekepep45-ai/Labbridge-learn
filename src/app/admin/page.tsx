@@ -143,7 +143,7 @@ export default function AdminPage() {
   const availableModules = modules.filter((item) => item.course_id === selectedCourse);
 
   return <main className="admin-page">
-    <header className="admin-header"><Link href="/" className="brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>CONTENT STUDIO</small></span></Link><nav className="admin-header-links"><Link href="/admin/assessments">Assessment Studio →</Link><Link href="/">← Student dashboard</Link></nav></header>
+    <header className="admin-header"><Link href="/" className="brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>CONTENT STUDIO</small></span></Link><nav className="admin-header-links"><Link href="/academic-review">Academic Review →</Link><Link href="/admin/assessments">Assessment Studio →</Link><Link href="/">← Student dashboard</Link></nav></header>
     <section className="admin-intro"><span className="admin-kicker">ACADEMIC CONTENT WORKSPACE</span><h1>Build the global learning library.</h1><p>Create globally relevant courses, organise modules and write lessons. New content stays in draft until it has been academically reviewed and deliberately published.</p></section>
     <div className="admin-notice"><strong>Academic quality gate</strong><span>Use lecturer-reviewed material, cite reliable international references, and verify clinical information before publishing. Include regional examples where they improve understanding, without restricting core learning to a single national curriculum. LabBridge lessons are educational and do not replace supervised clinical training.</span></div>
     <div className="admin-grid">
