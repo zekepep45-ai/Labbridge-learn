@@ -10,6 +10,9 @@ type Module = { id: string; title: string; description: string | null; position:
 type Lesson = { id: string; module_id: string; title: string; summary: string | null; content_markdown: string | null; estimated_minutes: number | null; position: number };
 type Resource = { id: string; lesson_id: string | null; title: string; description: string | null; resource_type: string; external_url: string | null; storage_path: string | null };
 type Progress = { id: string; lesson_id: string; completion_percent: number };
+type CourseTranslation = { title: string; description: string | null };
+type ModuleTranslation = { module_id: string; title: string; description: string | null };
+type LessonTranslation = { lesson_id: string; title: string; summary: string | null; content_markdown: string | null };
 
 export default function CoursePage() {
   const params = useParams<{ slug: string }>();
@@ -23,12 +26,17 @@ export default function CoursePage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [language, setLanguage] = useState("en");
+  const [translatedLessons, setTranslatedLessons] = useState(0);
 
   useEffect(() => {
     let active = true;
     async function load() {
       const { data: auth } = await supabase.auth.getSession();
       if (!auth.session) { window.location.href = "/"; return; }
+      const { data: preferenceData } = await supabase.from("user_preferences").select("preferred_language").eq("user_id", auth.session.user.id).maybeSingle();
+      const preferredLanguage = preferenceData?.preferred_language || "en";
+      if (active) setLanguage(preferredLanguage);
       const { data: courseData, error } = await supabase.from("courses")
         .select("id, title, description, discipline, level")
         .eq("slug", params.slug).eq("status", "published").maybeSingle();
@@ -48,10 +56,36 @@ export default function CoursePage() {
         supabase.from("learning_progress").select("id, lesson_id, completion_percent").eq("user_id", auth.session.user.id),
         supabase.from("learning_resources").select("id, lesson_id, title, description, resource_type, external_url, storage_path").eq("status", "published")
       ]);
+      let translatedCourse = courseData as Course;
+      let translatedModules = (moduleData ?? []) as Module[];
+      let translatedLessonsList = lessonData;
+      if (preferredLanguage !== "en") {
+        const [{ data: courseTranslation }, { data: moduleTranslations }, { data: lessonTranslations }] = await Promise.all([
+          supabase.from("course_translations").select("title,description").eq("course_id", courseData.id).eq("language_code", preferredLanguage).eq("translation_status", "published").maybeSingle(),
+          moduleIds.length
+            ? supabase.from("module_translations").select("module_id,title,description").in("module_id", moduleIds).eq("language_code", preferredLanguage).eq("translation_status", "published")
+            : Promise.resolve({ data: [] as ModuleTranslation[] }),
+          lessonData.length
+            ? supabase.from("lesson_translations").select("lesson_id,title,summary,content_markdown").in("lesson_id", lessonData.map((item) => item.id)).eq("language_code", preferredLanguage).eq("translation_status", "published")
+            : Promise.resolve({ data: [] as LessonTranslation[] })
+        ]);
+        if (courseTranslation) translatedCourse = { ...translatedCourse, title: courseTranslation.title, description: courseTranslation.description };
+        const moduleMap = new Map(((moduleTranslations ?? []) as ModuleTranslation[]).map((item) => [item.module_id, item]));
+        translatedModules = translatedModules.map((item) => {
+          const translation = moduleMap.get(item.id);
+          return translation ? { ...item, title: translation.title, description: translation.description } : item;
+        });
+        const lessonMap = new Map(((lessonTranslations ?? []) as LessonTranslation[]).map((item) => [item.lesson_id, item]));
+        translatedLessonsList = lessonData.map((item) => {
+          const translation = lessonMap.get(item.id);
+          return translation ? { ...item, title: translation.title, summary: translation.summary, content_markdown: translation.content_markdown } : item;
+        });
+        if (active) setTranslatedLessons(lessonMap.size);
+      }
       if (!active) return;
-      setCourse(courseData as Course);
-      setModules((moduleData ?? []) as Module[]);
-      setLessons(lessonData);
+      setCourse(translatedCourse);
+      setModules(translatedModules);
+      setLessons(translatedLessonsList);
       setProgress((progressData ?? []) as Progress[]);
       setResources(((resourceData ?? []) as Resource[]).filter((r) => !r.lesson_id || lessonData.some((l) => l.id === r.lesson_id)));
       setSelected(lessonData[0] ?? null);
@@ -88,7 +122,7 @@ export default function CoursePage() {
 
   return (
     <main className="course-page">
-      <header className="course-header"><Link href="/" className="brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>LEARN</small></span></Link><Link href="/" className="back-link">← Learning dashboard</Link></header>
+      <header className="course-header"><Link href="/" className="brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>LEARN</small></span></Link><span className="course-language">{language.toUpperCase()}{language !== "en" ? " · " + translatedLessons + "/" + lessons.length + " lessons translated" : " · ENGLISH"}</span><Link href="/" className="back-link">← Learning dashboard</Link></header>
       {message && !course ? <div className="course-notice">{message}</div> : course && <>
         <section className="course-hero"><div className="eyebrow"><span className="eyebrow-line"/> {course.level || "MLS CURRICULUM"} · {course.discipline}</div><h1>{course.title}</h1><p>{course.description || "Build your understanding through structured lessons and supporting learning resources."}</p><div className="course-progress-summary"><span>{completedCount} of {lessons.length} lessons completed</span><div className="progress-track"><span style={{ width: lessons.length ? Math.min(100, completedCount / lessons.length * 100) + "%" : "0%" }}/></div></div></section>
         <div className="course-layout">
