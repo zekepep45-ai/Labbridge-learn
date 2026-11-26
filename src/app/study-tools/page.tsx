@@ -74,7 +74,7 @@ export default function StudyToolsPage() {
   const completedTasks = store.tasks.filter(t => t.done).length;
   const streak = (() => {
     const days = new Set(store.studyDays);
-    let cursor = new Date(today() + "T12:00:00");
+    const cursor = new Date(today() + "T12:00:00");
     if (!days.has(today())) cursor.setDate(cursor.getDate() - 1);
     let count = 0;
     while (days.has(cursor.toISOString().slice(0, 10))) { count++; cursor.setDate(cursor.getDate() - 1); }
@@ -118,7 +118,7 @@ export default function StudyToolsPage() {
   if (!ready) return <main className="loading-screen">Preparing your study tools…</main>;
   return <main className="study-tools-page">
     <header className="study-tools-header"><Link href="/" className="brand"><span className="brand-mark">L+</span><span className="brand-copy"><strong>LabBridge</strong><small>STUDY TOOLS</small></span></Link><nav><Link href="/">Dashboard</Link><Link href="/study-centre">Study Centre</Link><Link href="/progress">Progress</Link></nav></header>
-    <section className="study-tools-hero"><div><div className="eyebrow">YOUR PERSONAL LEARNING WORKSPACE</div><h1>Study smarter.<br/><em>Remember more.</em></h1><p>Build a steady study habit with active recall, personal notes, saved resources and clear daily goals.</p></div><div className="study-streak-card"><span>YOUR CURRENT STREAK</span><strong>{streak} <small>{streak === 1 ? "day" : "days"}</small></strong><p>{store.studyDays.length} study days logged in total</p><button onClick={logStudy}>＋ Log today's study</button></div></section>
+    <section className="study-tools-hero"><div><div className="eyebrow">YOUR PERSONAL LEARNING WORKSPACE</div><h1>Study smarter.<br/><em>Remember more.</em></h1><p>Build a steady study habit with active recall, personal notes, saved resources and clear daily goals.</p></div><div className="study-streak-card"><span>YOUR CURRENT STREAK</span><strong>{streak} <small>{streak === 1 ? "day" : "days"}</small></strong><p>{store.studyDays.length} study days logged in total</p><button onClick={logStudy}>＋ Log today&apos;s study</button></div></section>
     <div className="study-tools-stats"><article><strong>{store.cards.length}</strong><span>Flashcards</span></article><article><strong>{store.notes.length}</strong><span>Personal notes</span></article><article><strong>{store.bookmarks.length}</strong><span>Bookmarks</span></article><article><strong>{completedTasks}/{store.tasks.length}</strong><span>Goals completed</span></article></div>
     <nav className="study-tools-tabs" aria-label="Study tools">{(["overview","flashcards","notes","bookmarks","planner"] as const).map(t=><button key={t} className={tab===t?"active":""} onClick={()=>{setTab(t);setMessage("");}}>{t==="overview"?"Overview":t==="flashcards"?"Flashcards":t==="notes"?"My notes":t==="bookmarks"?"Bookmarks":"Study planner"}</button>)}</nav>
     {message&&<p className="study-tools-message" role="status">{message}</p>}
