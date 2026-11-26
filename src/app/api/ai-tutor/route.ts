@@ -141,7 +141,7 @@ The following excerpts, if present, are published learning materials. Use them a
 ${curriculumContext || "No published lesson excerpts are currently available for retrieval. Answer from established general MLS knowledge and clearly state uncertainty when relevant."}`;
 
     const result = streamText({
-      model: google("gemini-3-flash"),
+      model: google("gemini-3.8-flash"),
       instructions,
       messages,
       maxOutputTokens: 1000,
