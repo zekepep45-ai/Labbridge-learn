@@ -96,15 +96,15 @@ export async function POST(request: Request) {
           const moduleMap = new Map(modules.map(module => [module.id, module]));
           const courseMap = new Map(courses.map(course => [course.id, course]));
           const ranked = lessons.map(lesson => {
-            const module = moduleMap.get(lesson.module_id);
-            const course = module ? courseMap.get(module.course_id) : null;
-            const searchable = `${lesson.title} ${lesson.summary || ""} ${module?.title || ""} ${course?.title || ""} ${course?.discipline || ""}`.toLowerCase();
+            const moduleInfo = moduleMap.get(lesson.module_id);
+            const course = moduleInfo ? courseMap.get(moduleInfo.course_id) : null;
+            const searchable = `${lesson.title} ${lesson.summary || ""} ${moduleInfo?.title || ""} ${course?.title || ""} ${course?.discipline || ""}`.toLowerCase();
             const score = keywords.reduce((total, word) => total + (searchable.includes(word) ? 1 : 0), 0);
-            return { lesson, module, course, score };
+            return { lesson, moduleInfo, course, score };
           }).sort((a, b) => b.score - a.score).slice(0, 4);
 
-          curriculumContext = ranked.map(({ lesson, module, course }) =>
-            `Course: ${course?.title || "Published course"} | Discipline: ${course?.discipline || "MLS"} | Module: ${module?.title || "Module"} | Lesson: ${lesson.title}\nSummary: ${lesson.summary || ""}\nLesson content: ${(lesson.content_markdown || "").slice(0, 3200)}`
+          curriculumContext = ranked.map(({ lesson, moduleInfo, course }) =>
+            `Course: ${course?.title || "Published course"} | Discipline: ${course?.discipline || "MLS"} | Module: ${moduleInfo?.title || "Module"} | Lesson: ${lesson.title}\nSummary: ${lesson.summary || ""}\nLesson content: ${(lesson.content_markdown || "").slice(0, 3200)}`
           ).join("\n\n---\n\n");
         }
       }
