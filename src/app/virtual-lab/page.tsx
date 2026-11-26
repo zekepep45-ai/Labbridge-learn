@@ -134,7 +134,7 @@ export default function VirtualLabPage() {
         <div className="eyebrow"><span className="eyebrow-line"/> LABBRIDGE VIRTUAL LABORATORY</div>
         <h1>Think like a laboratory<br/><em>professional.</em></h1>
         <p>Practise specimen reception decisions in a safe, simulated environment. Inspect each sample, choose an action and learn from the outcome.</p>
-        <div className="vl-safety"><span>✳</span><div><strong>Educational simulation only</strong><small>These are fictional training scenarios, not real patient samples or clinical instructions. Always follow your institution's approved SOPs and supervisor guidance.</small></div></div>
+        <div className="vl-safety"><span>✳</span><div><strong>Educational simulation only</strong><small>These are fictional training scenarios, not real patient samples or clinical instructions. Always follow your institution&apos;s approved SOPs and supervisor guidance.</small></div></div>
       </section>
 
       <section className="vl-workspace">
