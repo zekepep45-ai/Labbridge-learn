@@ -37,6 +37,7 @@ export default function Home() {
   const [countries, setCountries] = useState<Country[]>([]);
   const [planCode, setPlanCode] = useState("free");
   const [canReviewAcademicContent, setCanReviewAcademicContent] = useState(false);
+  const [canCreateAcademicContent, setCanCreateAcademicContent] = useState(false);
   const preferenceChoice = useRef({ language: "en" as SupportedLocale, countryCode: "GH" });
   const t = getMessages(language);
 
@@ -53,6 +54,7 @@ export default function Home() {
     ]);
 
     setCanReviewAcademicContent((roleRows ?? []).some((item) => ["admin", "academic_reviewer"].includes(item.role)));
+    setCanCreateAcademicContent((roleRows ?? []).some((item) => ["admin", "content_editor", "lecturer"].includes(item.role)));
     if (profileData) setProfile(profileData);
     else {
       const name = (currentUser.user_metadata?.full_name as string | undefined) ?? "";
@@ -202,7 +204,8 @@ export default function Home() {
           <a className="nav-item" href="/ai-tutor"><span className="nav-icon">✦</span> LabBridge AI Tutor</a>
           <a className="nav-item" href="/study-tools"><span className="nav-icon">✧</span> Personal Study Tools</a>
           <a className="nav-item" href="/revision"><span className="nav-icon">⌕</span> Smart Revision & Question Bank</a>
-          <a className="nav-item" href="/certificates"><span className="nav-icon">✧</span> Certificates</a>\n          {canReviewAcademicContent && <a className="nav-item" href="/academic-review"><span className="nav-icon">✓</span> Academic Review Centre</a>}
+          <a className="nav-item" href="/certificates"><span className="nav-icon">✧</span> Certificates</a>\n          {canCreateAcademicContent && <a className="nav-item" href="/lecturer"><span className="nav-icon">✎</span> Lecturer Workspace</a>}
+          {canReviewAcademicContent && <a className="nav-item" href="/academic-review"><span className="nav-icon">✓</span> Academic Review Centre</a>}
           <a className="nav-item" href="#courses"><span className="nav-icon">▤</span> {t.myCourses}</a>
           <a className="nav-item" href="#resources"><span className="nav-icon">▧</span> {t.studyResources}</a>
           <a className="nav-item" href="/progress"><span className="nav-icon">◎</span> {t.practiceQuizzes}</a>
