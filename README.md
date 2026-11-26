@@ -1,25 +1,30 @@
 # LabBridge Learn
 
-LabBridge is a Ghana-first Medical Laboratory Science (MLS) technology ecosystem. **LabBridge Learn** is its first product: a learning space for MLS students and early-career laboratory professionals.
+**LabBridge Learn** is a global Medical Laboratory Science (MLS) education platform for students, educators and early-career laboratory professionals. It combines a globally relevant academic library with multilingual learning, practical study tools and a pathway to advanced digital laboratory education.
 
 ## Product direction
 
-- Clear, accessible MLS learning resources.
-- Course-based learning paths, topics, and study progress.
-- Practical knowledge checks and revision tools.
-- A foundation that can later connect to the wider LabBridge ecosystem.
+- One global MLS knowledge library built around internationally relevant scientific principles and academic standards.
+- Multilingual learning experiences, with English, French, Portuguese, Arabic, Swahili and Spanish interface support.
+- Foundational, intermediate, advanced and professional learning content.
+- Visual explanations, practical demonstrations, case-based learning and knowledge checks.
+- Freemium access, with foundational learning available free and advanced capabilities planned for paid learners and institutions.
+- Regional examples may enrich lessons, but learner country preferences do not determine or split the core curriculum.
+
+## Academic quality and safety
+
+- Draft course content must be reviewed by qualified educators or subject-matter experts before publication.
+- Cite reliable textbooks, peer-reviewed research and relevant international guidance.
+- Keep clinical examples educational and de-identified; never enter real patient-identifiable information.
+- LabBridge Learn supplements, but does not replace, supervised practical training or professional clinical judgement.
+- Preserve and review Supabase Row Level Security (RLS) when connecting application features.
+- Never expose a Supabase service-role key in browser code.
 
 ## Technology
 
-- Next.js App Router
-- React and TypeScript
-- CSS for the initial responsive interface
-- Supabase for authentication and data (existing project: `labbridge-learn`)
+- Next.js App Router, React and TypeScript
+- Supabase for authentication and application data
 - Vercel for hosting and Git-based continuous deployment
-
-## Deployment
-
-The application is intended to deploy on Vercel from the GitHub repository. Select Next.js as the framework, use the repository root as the Root Directory, and keep the default build command (`next build`). Pushes to `main` can deploy to production once the Git integration is authorized.
 
 ## Local development
 
@@ -30,13 +35,11 @@ npm run dev
 
 Open http://localhost:3000.
 
-## Safety and scope
+## Core project areas
 
-- Do not enter real patient information or identifiable clinical data.
-- Keep the LabBridge project separate from Instivora and MLS Attendance–TTU.
-- Preserve and review Supabase Row Level Security (RLS) before connecting application features.
-- Never expose a Supabase service-role key in browser code.
+- Student learning dashboard
+- Global academic course library
+- Academic Content Studio for course, module and lesson authoring
+- Multilingual course translation workflow
+- Freemium subscription foundations
 
-## Status
-
-The initial interface scaffold is being established. Database infrastructure exists in Supabase; application integration and deployment are separate next steps.
