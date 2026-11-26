@@ -88,6 +88,7 @@ export default function CoursePage() {
       if (!active) return;
       setCourse(translatedCourse);
       setModules(translatedModules);
+      setAssessments((assessmentData ?? []) as Assessment[]);
       setLessons(translatedLessonsList);
       setProgress((progressData ?? []) as Progress[]);
       setResources(((resourceData ?? []) as Resource[]).filter((r) => !r.lesson_id || lessonData.some((l) => l.id === r.lesson_id)));
