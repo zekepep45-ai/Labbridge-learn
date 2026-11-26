@@ -6,7 +6,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase";
 
 type Course = { id: string; title: string; status: string };
 type Assessment = { id: string; course_id: string; title: string; slug: string; question_count: number; pass_mark: number; status: string };
-type Question = { id: string; stem: string; difficulty: string; status: string };
+type Question = { id: string; stem: string; difficulty: string; status: string; options: { key: string; text: string }[]; answer_key: string; explanation: string; reference_text: string | null };
 
 export default function AssessmentStudioPage() {
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
@@ -45,12 +45,9 @@ export default function AssessmentStudioPage() {
 
   async function loadQuestions(assessmentId: string) {
     if (!assessmentId) { setQuestions([]); return; }
-    const { data: links } = await supabase.from("assessment_question_links").select("question_id,position").eq("assessment_id", assessmentId).order("position");
-    const ids = (links ?? []).map((item) => item.question_id);
-    if (!ids.length) { setQuestions([]); return; }
-    const { data } = await supabase.from("assessment_questions").select("id,stem,difficulty,status").in("id", ids);
-    const map = new Map((data ?? []).map((item) => [item.id, item]));
-    setQuestions(ids.map((id) => map.get(id)).filter(Boolean) as Question[]);
+    const { data, error } = await supabase.rpc("get_assessment_review", { p_assessment_id: assessmentId });
+    if (error) { setMessage("Could not load question review: " + error.message); setQuestions([]); return; }
+    setQuestions((data ?? []) as Question[]);
   }
 
   useEffect(() => {
@@ -161,7 +158,7 @@ export default function AssessmentStudioPage() {
         <button className="primary-button" disabled={busy || !selectedAssessment}>Add draft question →</button>
       </form></section>
       <section className="admin-card admin-card-wide"><div className="admin-card-head"><span>03 / REVIEW & PUBLISH</span><h2>Assessment readiness</h2></div>
-        <div className="content-outline"><div><span>ASSESSMENT</span><strong>{activeAssessment?.title || "Choose an assessment"}</strong><small>{activeAssessment?.status.toUpperCase() || "NOT SELECTED"}</small></div><div className="outline-child"><span>QUESTION BANK</span><strong>{questions.length} of {activeAssessment?.question_count ?? 0} questions added</strong>{questions.map((item,index) => <p key={item.id}>{String(index+1).padStart(2,"0")} · {item.stem} <small>{item.status.toUpperCase()} · {item.difficulty}</small></p>)}</div></div>
+        <div className="content-outline"><div><span>ASSESSMENT</span><strong>{activeAssessment?.title || "Choose an assessment"}</strong><small>{activeAssessment?.status.toUpperCase() || "NOT SELECTED"}</small></div><div className="outline-child"><span>QUESTION BANK</span><strong>{questions.length} of {activeAssessment?.question_count ?? 0} questions added</strong>{questions.map((item,index) => <div className="assessment-review-item" key={item.id}><p>{String(index+1).padStart(2,"0")} · {item.stem} <small>{item.status.toUpperCase()} · {item.difficulty}</small></p><ul>{item.options.map((option) => <li key={option.key} className={option.key === item.answer_key ? "assessment-answer-key" : ""}>{option.key}. {option.text}{option.key === item.answer_key ? " · BEST ANSWER" : ""}</li>)}</ul><p className="assessment-explanation"><strong>Explanation:</strong> {item.explanation}</p>{item.reference_text && <p className="assessment-reference">Reference: {item.reference_text}</p>}</div>)}</div></div>
         <div className="publish-check" style={{marginTop:16}}><p>Publishing makes this quiz available to learners once its parent course is published. Verify the question, answer, explanation and reference for every item.</p><label className="review-check"><input type="checkbox" checked={reviewConfirmed} onChange={(e) => setReviewConfirmed(e.target.checked)}/> I confirm that every question has completed academic review.</label><button className="primary-button" disabled={busy || !activeAssessment || activeAssessment.status === "published" || !reviewConfirmed} onClick={publishAssessment}>Publish assessment ↗</button></div>
       </section>
     </div>
