@@ -284,3 +284,22 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 .library-footer{max-width:1120px;margin:0 auto;border-top:1px solid var(--line);padding:18px 0 25px;display:flex;justify-content:space-between;font-size:8px;color:#9aa69e}
 @media(max-width:900px){.library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.library-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.library-search{grid-column:1/-1}}
 @media(max-width:560px){.library-page{padding:0 15px}.library-header{height:65px}.library-header nav{gap:12px;font-size:9px}.library-hero{padding:43px 0 35px}.library-hero h1{letter-spacing:-2px}.library-grid{grid-template-columns:1fr}.library-filters{grid-template-columns:1fr 1fr}.library-search{grid-column:1/-1}.library-heading{align-items:start;flex-direction:column}.library-admin-toggle{align-items:flex-start;flex-direction:column}.library-footer{gap:10px;flex-wrap:wrap}}
+
+
+/* Structured academic lesson typography */
+.markdown-content{color:#43564b;font-size:13px;line-height:1.9;overflow-wrap:anywhere}
+.markdown-content h2,.markdown-content h3,.markdown-content h4,.markdown-content h5{font-family:Manrope,sans-serif;color:#294438;line-height:1.35;margin:26px 0 10px;letter-spacing:-.35px}
+.markdown-content h2{font-size:22px}.markdown-content h3{font-size:18px}.markdown-content h4{font-size:15px}.markdown-content h5{font-size:13px}
+.markdown-content p{margin:0 0 15px}
+.markdown-content ul,.markdown-content ol{padding-left:23px;margin:10px 0 19px}
+.markdown-content li{padding-left:4px;margin:5px 0}
+.markdown-content strong{color:#294438;font-weight:800}
+.markdown-content a{color:#28704f;text-decoration:underline;text-underline-offset:3px}
+.markdown-content code{background:#f0f5f1;border:1px solid #e3ece5;border-radius:4px;padding:2px 5px;font-size:.9em}
+.markdown-content pre{background:#f4f7f4;border:1px solid #e5ece6;border-radius:9px;padding:15px;overflow-x:auto;margin:14px 0}
+.markdown-content pre code{padding:0;border:0;background:transparent}
+.markdown-content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid #8eb79b;background:#f4f8f4;color:#62776a;border-radius:0 7px 7px 0}
+.markdown-content hr{border:0;border-top:1px solid #e6ede7;margin:22px 0}
+.course-page[dir="rtl"] .markdown-content{direction:rtl;text-align:right}
+.course-page[dir="rtl"] .markdown-content ul,.course-page[dir="rtl"] .markdown-content ol{padding-left:0;padding-right:23px}
+.course-page[dir="rtl"] .markdown-content blockquote{border-left:0;border-right:3px solid #8eb79b;border-radius:7px 0 0 7px}
