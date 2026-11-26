@@ -36,11 +36,12 @@ export default function Home() {
   const [countryCode, setCountryCode] = useState("GH");
   const [countries, setCountries] = useState<Country[]>([]);
   const [planCode, setPlanCode] = useState("free");
+  const [canReviewAcademicContent, setCanReviewAcademicContent] = useState(false);
   const preferenceChoice = useRef({ language: "en" as SupportedLocale, countryCode: "GH" });
   const t = getMessages(language);
 
   async function loadLearningSpace(currentUser: User) {
-    const [{ data: profileData }, { data: courseData }, { data: enrollmentData }, { data: progressData }, { data: preferenceData }, { data: countryData }, { data: subscriptionData }] = await Promise.all([
+    const [{ data: profileData }, { data: courseData }, { data: enrollmentData }, { data: progressData }, { data: preferenceData }, { data: countryData }, { data: subscriptionData }, { data: roleRows }] = await Promise.all([
       supabase.from("profiles").select("full_name, student_number").eq("id", currentUser.id).maybeSingle(),
       supabase.from("courses").select("id, title, slug, description, discipline, level, cover_image_url").eq("status", "published").order("created_at", { ascending: false }),
       supabase.from("enrollments").select("course_id").eq("user_id", currentUser.id),
@@ -50,7 +51,7 @@ export default function Home() {
       supabase.from("user_subscriptions").select("plan_code").eq("user_id", currentUser.id).in("status", ["active", "trialing"]).maybeSingle()
     ]);
 
-    if (profileData) setProfile(profileData);
+    setCanReviewAcademicContent((roleRows ?? []).some((item) => ["admin", "academic_reviewer"].includes(item.role)));\n    if (profileData) setProfile(profileData);
     else {
       const name = (currentUser.user_metadata?.full_name as string | undefined) ?? "";
       const { data } = await supabase.from("profiles").upsert({ id: currentUser.id, full_name: name }, { onConflict: "id" }).select("full_name, student_number").maybeSingle();
@@ -199,7 +200,7 @@ export default function Home() {
           <a className="nav-item" href="/ai-tutor"><span className="nav-icon">✦</span> LabBridge AI Tutor</a>
           <a className="nav-item" href="/study-tools"><span className="nav-icon">✧</span> Personal Study Tools</a>
           <a className="nav-item" href="/revision"><span className="nav-icon">⌕</span> Smart Revision & Question Bank</a>
-          <a className="nav-item" href="/certificates"><span className="nav-icon">✧</span> Certificates</a>
+          <a className="nav-item" href="/certificates"><span className="nav-icon">✧</span> Certificates</a>\n          {canReviewAcademicContent && <a className="nav-item" href="/academic-review"><span className="nav-icon">✓</span> Academic Review Centre</a>}
           <a className="nav-item" href="#courses"><span className="nav-icon">▤</span> {t.myCourses}</a>
           <a className="nav-item" href="#resources"><span className="nav-icon">▧</span> {t.studyResources}</a>
           <a className="nav-item" href="/progress"><span className="nav-icon">◎</span> {t.practiceQuizzes}</a>
