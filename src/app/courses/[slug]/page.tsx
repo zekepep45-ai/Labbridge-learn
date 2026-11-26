@@ -10,7 +10,8 @@ type Course = { id: string; title: string; description: string | null; disciplin
 type Module = { id: string; title: string; description: string | null; position: number };
 type Lesson = { id: string; module_id: string; title: string; summary: string | null; content_markdown: string | null; estimated_minutes: number | null; position: number };
 type Resource = { id: string; lesson_id: string | null; title: string; description: string | null; resource_type: string; external_url: string | null; storage_path: string | null };
-type Progress = { id: string; lesson_id: string; completion_percent: number };\ntype Assessment = { id: string; title: string; description: string | null; question_count: number; pass_mark: number };
+type Progress = { id: string; lesson_id: string; completion_percent: number };
+type Assessment = { id: string; title: string; description: string | null; question_count: number; pass_mark: number };
 type ModuleTranslation = { module_id: string; title: string; description: string | null };
 type LessonTranslation = { lesson_id: string; title: string; summary: string | null; content_markdown: string | null };
 
