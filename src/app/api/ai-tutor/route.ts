@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { streamText } from "ai";
+import { google } from "@ai-sdk/google";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -32,6 +33,10 @@ export async function POST(request: Request) {
 
     const { data: authData, error: authError } = await supabase.auth.getUser(token);
     if (authError || !authData.user) return jsonError("Your session has expired. Please sign in again.", 401);
+
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+      return jsonError("The Gemini API key is not configured. Please contact the LabBridge administrator.", 503);
+    }
 
     const body = await request.json().catch(() => null) as { messages?: unknown; mode?: unknown } | null;
     if (!body || !Array.isArray(body.messages)) return jsonError("Send a question to begin.", 400);
@@ -136,7 +141,7 @@ The following excerpts, if present, are published learning materials. Use them a
 ${curriculumContext || "No published lesson excerpts are currently available for retrieval. Answer from established general MLS knowledge and clearly state uncertainty when relevant."}`;
 
     const result = streamText({
-      model: "google/gemini-3-flash",
+      model: google("gemini-3-flash"),
       instructions,
       messages,
       maxOutputTokens: 1000,
