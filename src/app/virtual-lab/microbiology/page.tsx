@@ -1,0 +1,1 @@
+import ExtendedVirtualLab from "@/components/ExtendedVirtualLab";export default function Page(){return <ExtendedVirtualLab slug="microbiology"/>;}
