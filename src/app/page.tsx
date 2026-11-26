@@ -72,6 +72,7 @@ export default function Home() {
 
   useEffect(() => {
     let active = true;
+    supabase.from("countries").select("code,name,default_language_code").eq("is_enabled", true).order("name").then(({ data }) => { if (active && data) setCountries(data as Country[]); });
     supabase.auth.getSession().then(async ({ data }) => {
       if (!active) return;
       setUser(data.session?.user ?? null);
