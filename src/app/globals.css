@@ -366,3 +366,11 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 
 .admin-header-links{display:flex;align-items:center;gap:18px}.admin-header-links a{font-size:9px;color:#34734f;font-weight:800;text-decoration:none}
 @media(max-width:520px){.admin-header-links{gap:9px}.admin-header-links a{font-size:8px}}
+
+.assessment-form-actions,.assessment-item-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:9px}
+.secondary-button,.danger-button{border:1px solid #dce7de;background:#fff;color:#4d6c58;border-radius:7px;padding:9px 12px;font:700 9px Manrope;cursor:pointer}
+.secondary-button:hover{background:#f1f6f2}
+.danger-button{border-color:#f0d9d4;color:#a65b4b}
+.danger-button:hover{background:#fff5f2}
+.assessment-item-actions{padding-top:8px;border-top:1px solid #edf1ed}
+.assessment-item-actions button:disabled{opacity:.45;cursor:not-allowed}
