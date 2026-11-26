@@ -30,7 +30,6 @@ export default function AcademicLibraryPage() {
   const [sort, setSort] = useState("A–Z");
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [showDrafts, setShowDrafts] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -46,14 +45,13 @@ export default function AcademicLibraryPage() {
       let courseQuery = supabase.from("courses")
         .select("id,title,slug,description,discipline,level,status,created_at")
         .order("title");
-      if (!admin) courseQuery = courseQuery.eq("status", "published");
       const { data, error: courseError } = await courseQuery;
       if (courseError) {
         if (active) { setError(courseError.message); setLoading(false); }
         return;
       }
       const list = (data ?? []) as Course[];
-      const visible = admin && !showDrafts ? list.filter((item) => item.status === "published") : list;
+      const visible = list;
       const ids = visible.map((item) => item.id);
       const nextCounts: Record<string, CourseCounts> = {};
       if (ids.length) {
@@ -77,20 +75,20 @@ export default function AcademicLibraryPage() {
     }
     void load();
     return () => { active = false; };
-  }, [supabase, router, showDrafts]);
+  }, [supabase, router]);
 
   const disciplines = useMemo(() => ["All subjects", ...Array.from(new Set(courses.filter((item) => item.status === "published").map((item) => item.discipline).filter(Boolean))).sort()], [courses]);
   const visibleCourses = useMemo(() => {
     const term = query.trim().toLowerCase();
     const filtered = courses.filter((course) => {
-      const publishedOrPreview = course.status === "published" || (isAdmin && showDrafts);
+      const publishedOrPreview = true;
       const matchesTerm = !term || [course.title, course.description, course.discipline, course.level].some((value) => (value || "").toLowerCase().includes(term));
       const matchesDiscipline = discipline === "All subjects" || course.discipline === discipline;
       const matchesLevel = level === "All levels" || course.level === level;
       return publishedOrPreview && matchesTerm && matchesDiscipline && matchesLevel;
     });
     return filtered.sort((a, b) => sort === "Newest" ? b.created_at.localeCompare(a.created_at) : a.title.localeCompare(b.title));
-  }, [courses, query, discipline, level, sort, isAdmin, showDrafts]);
+  }, [courses, query, discipline, level, sort]);
 
   if (loading) return <main className="loading-screen"><div className="loading-mark">L<span>+</span></div><p>Opening the academic library…</p></main>;
 
@@ -114,7 +112,8 @@ export default function AcademicLibraryPage() {
           <label><span>Learning level</span><select value={level} onChange={(event) => setLevel(event.target.value)}>{levels.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label><span>Sort</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option>A–Z</option><option>Newest</option></select></label>
         </div>
-        {isAdmin && <div className="library-admin-toggle"><label><input type="checkbox" checked={showDrafts} onChange={(event) => setShowDrafts(event.target.checked)}/> Include draft courses in my admin preview</label><Link href="/admin">Manage academic content ↗</Link></div>}
+        {isAdmin && <div className="library-admin-toggle"><span>Admin view · includes courses in development</span><Link href="/admin">Manage academic content ↗</Link></div>}
+        {!isAdmin && <p className="library-catalog-note">The catalogue includes courses in development. Lessons become accessible after academic review and publication.</p>}
         {error && <p className="library-error" role="alert">We couldn&apos;t load the library: {error}</p>}
         {visibleCourses.length ? <div className="library-grid">{visibleCourses.map((course) => {
           const courseCount = counts[course.id] || { modules: 0, lessons: 0 };
@@ -124,8 +123,8 @@ export default function AcademicLibraryPage() {
             <h3>{course.title}</h3>
             <p>{course.description || "A structured course designed to build understanding through clear explanations and guided learning."}</p>
             <div className="library-card-meta"><span>{courseCount.modules} modules</span><span>{courseCount.lessons} published lessons</span></div>
-            {course.status !== "published" && <span className="library-draft">DRAFT · ADMIN PREVIEW</span>}
-            {course.status === "published" ? <Link className="library-open" href={"/courses/" + course.slug}>Explore course <span>↗</span></Link> : <span className="library-unavailable">Not visible to learners until reviewed and published</span>}
+            {course.status !== "published" && <span className="library-draft">COMING SOON · UNDER DEVELOPMENT</span>}
+            {course.status === "published" ? <Link className="library-open" href={"/courses/" + course.slug}>Explore course <span>↗</span></Link> : <span className="library-unavailable">Course content is being developed and academically reviewed</span>}
           </article>;
         })}</div> : <div className="library-empty"><span>✳</span><h3>{courses.length === 0 ? "The global library is being prepared" : "No courses match your search"}</h3><p>{courses.length === 0 ? "Our academic team is developing and reviewing the first collection of MLS courses. New learning content will appear here once it is ready for learners." : "Try another search term or adjust the subject and level filters."}</p>{(query || discipline !== "All subjects" || level !== "All levels") && <button onClick={() => { setQuery(""); setDiscipline("All subjects"); setLevel("All levels"); }}>Clear filters</button>}</div>}
       </section>
