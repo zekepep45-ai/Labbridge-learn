@@ -15,6 +15,11 @@ LabBridge is a Ghana-first Medical Laboratory Science (MLS) technology ecosystem
 - React and TypeScript
 - CSS for the initial responsive interface
 - Supabase for authentication and data (existing project: `labbridge-learn`)
+- Vercel for hosting and Git-based continuous deployment
+
+## Deployment
+
+The application is intended to deploy on Vercel from the GitHub repository. Select Next.js as the framework, use the repository root as the Root Directory, and keep the default build command (`next build`). Pushes to `main` can deploy to production once the Git integration is authorized.
 
 ## Local development
 
