@@ -115,7 +115,7 @@ export default function AcademicLibraryPage() {
           <label><span>Sort</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option>A–Z</option><option>Newest</option></select></label>
         </div>
         {isAdmin && <div className="library-admin-toggle"><label><input type="checkbox" checked={showDrafts} onChange={(event) => setShowDrafts(event.target.checked)}/> Include draft courses in my admin preview</label><Link href="/admin">Manage academic content ↗</Link></div>}
-        {error && <p className="library-error" role="alert">We couldn't load the library: {error}</p>}
+        {error && <p className="library-error" role="alert">We couldn&apos;t load the library: {error}</p>}
         {visibleCourses.length ? <div className="library-grid">{visibleCourses.map((course) => {
           const courseCount = counts[course.id] || { modules: 0, lessons: 0 };
           return <article className="library-card" key={course.id}>
