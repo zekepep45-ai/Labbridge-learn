@@ -88,7 +88,7 @@ export default function CoursePage() {
       setLessons(translatedLessonsList);
       setProgress((progressData ?? []) as Progress[]);
       setResources(((resourceData ?? []) as Resource[]).filter((r) => !r.lesson_id || lessonData.some((l) => l.id === r.lesson_id)));
-      setSelected(lessonData[0] ?? null);
+      setSelected(translatedLessonsList[0] ?? null);
       setLoading(false);
     }
     void load();
@@ -121,7 +121,7 @@ export default function CoursePage() {
   const currentResources = resources.filter((item) => !item.lesson_id || item.lesson_id === selected?.id);
 
   return (
-    <main className="course-page">
+    <main className="course-page" dir={language === "ar" ? "rtl" : "ltr"}>
       <header className="course-header"><Link href="/" className="brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>LEARN</small></span></Link><span className="course-language">{language.toUpperCase()}{language !== "en" ? " · " + translatedLessons + "/" + lessons.length + " lessons translated" : " · ENGLISH"}</span><Link href="/" className="back-link">← Learning dashboard</Link></header>
       {message && !course ? <div className="course-notice">{message}</div> : course && <>
         <section className="course-hero"><div className="eyebrow"><span className="eyebrow-line"/> {course.level || "MLS CURRICULUM"} · {course.discipline}</div><h1>{course.title}</h1><p>{course.description || "Build your understanding through structured lessons and supporting learning resources."}</p><div className="course-progress-summary"><span>{completedCount} of {lessons.length} lessons completed</span><div className="progress-track"><span style={{ width: lessons.length ? Math.min(100, completedCount / lessons.length * 100) + "%" : "0%" }}/></div></div></section>
