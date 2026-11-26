@@ -133,7 +133,7 @@ export default function LearningProgressPage() {
       {practicalAttempts.length === 0 ? <div className="progress-empty"><span>⚗</span><h3>No practical sessions yet</h3><p>Complete a virtual laboratory simulation to build your practical learning record.</p><Link href="/virtual-lab">Enter the Virtual Laboratory →</Link></div> :
         <div className="progress-history">{practicalAttempts.map((attempt) => <article className="progress-history-row" key={attempt.id}>
           <div className="progress-history-icon">⚗</div>
-          <div className="progress-history-main"><strong>Specimen Reception &amp; Acceptance</strong><small>{attempt.correct_count} of {attempt.total_stations} stations correct · {new Date(attempt.completed_at).toLocaleDateString()}</small></div>
+          <div className="progress-history-main"><strong>{attempt.simulation_slug === "haematology-cbc" ? "Haematology: CBC Interpretation" : "Specimen Reception &amp; Acceptance"}</strong><small>{attempt.correct_count} of {attempt.total_stations} stations correct · {new Date(attempt.completed_at).toLocaleDateString()}</small></div>
           <div className="progress-history-score"><strong>{attempt.score}%</strong><span className="passed">PRACTICE RESULT</span></div>
         </article>)}</div>}
       <Link href="/virtual-lab" className="progress-study-link">Practise another simulation →</Link>
