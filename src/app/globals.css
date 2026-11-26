@@ -161,3 +161,43 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 .course-link{display:block;text-decoration:none;color:var(--green);font-size:10px;font-weight:700;padding:12px 0 0}
 .course-link span{float:right}
 @media(max-width:760px){.course-page{padding:0 16px 40px}.course-header{height:66px}.course-layout{grid-template-columns:1fr}.lesson-sidebar{position:static}.lesson-content{padding:22px}.course-hero{padding:38px 0 25px}.lesson-actions{align-items:flex-start;flex-direction:column}.lesson-actions .primary-button{width:100%}}
+
+/* Academic Content Studio */
+.admin-page{min-height:100vh;background:#f8faf8;padding:0 clamp(18px,5vw,72px) 45px}
+.admin-header{height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.admin-header .brand{margin:0;padding:0}.admin-header>a:last-child{font-size:10px;color:var(--green);font-weight:700}
+.admin-intro{max-width:850px;margin:48px auto 25px}
+.admin-kicker{font-size:9px;font-weight:800;letter-spacing:1.8px;color:#72927e}
+.admin-intro h1{font:800 clamp(32px,4vw,46px) Manrope;letter-spacing:-2px;margin:12px 0}
+.admin-intro p{font-size:12px;line-height:1.8;color:#78877f;max-width:690px}
+.admin-notice{max-width:1150px;margin:0 auto 20px;background:#edf5ef;border:1px solid #dce9df;border-radius:10px;padding:14px 17px;display:grid;gap:5px}
+.admin-notice strong{font:700 11px Manrope;color:#315c43}.admin-notice span{font-size:10px;line-height:1.7;color:#6e8074}
+.admin-grid{max-width:1150px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.admin-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:22px;min-width:0}
+.admin-card-wide{grid-column:1/-1}
+.admin-card-head{margin-bottom:18px}.admin-card-head>span{font-size:8px;letter-spacing:1.5px;font-weight:800;color:#8da195}
+.admin-card-head h2{font-size:19px;margin-top:7px}
+.admin-form{display:grid;gap:13px}
+.admin-form label,.publish-layout label{display:grid;gap:6px;font-size:9px;font-weight:700;color:#52665b}
+.admin-form input,.admin-form textarea,.admin-form select,.publish-layout select{width:100%;border:1px solid #e1e9e3;border-radius:7px;background:#fcfdfc;padding:11px 12px;font:11px 'DM Sans',sans-serif;color:#263e33;outline:none}
+.admin-form textarea{resize:vertical;line-height:1.65}
+.admin-form input:focus,.admin-form textarea:focus,.admin-form select:focus,.publish-layout select:focus{border-color:#79a98a;box-shadow:0 0 0 3px #edf5ef}
+.admin-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.admin-form .primary-button,.publish-check .primary-button{padding:0 16px;justify-self:start}
+.publish-layout{display:grid;grid-template-columns:1.1fr .9fr;gap:25px}
+.content-outline{border:1px solid #e9efea;border-radius:9px;margin-top:14px;padding:13px;display:grid;gap:11px}
+.content-outline>div{display:grid;gap:4px}
+.content-outline span{font-size:7px;letter-spacing:1.2px;font-weight:800;color:#94a39a}
+.content-outline strong{font-size:10px;color:#3a5145}
+.content-outline small{font-size:8px;color:#a18b5c}
+.content-outline .outline-child{padding:10px 0 0 13px;border-top:1px solid #edf1ed}
+.content-outline p{font-size:9px;color:#687b70;margin:4px 0 0}
+.publish-check{background:#f7faf7;border:1px solid #e8efe9;border-radius:9px;padding:16px;display:flex;flex-direction:column;align-items:flex-start;gap:13px}
+.publish-check>p{font-size:10px;line-height:1.7;color:#6e8074;margin:0}
+.review-check{display:flex!important;grid-template-columns:16px 1fr;align-items:start;gap:8px!important;font-size:9px!important;line-height:1.6;color:#496452!important}
+.review-check input{margin:1px 0 0;accent-color:#28704f}
+.publish-check small{font-size:8px;line-height:1.6;color:#929f96}
+.admin-feedback{max-width:1150px;margin:18px auto;background:#edf5ef;border:1px solid #dce9df;color:#356b50;border-radius:8px;padding:12px 14px;font-size:10px}
+.admin-footer{max-width:1150px;margin:25px auto 0;padding-top:15px;border-top:1px solid var(--line);font-size:8px;color:#9aa59f}
+.admin-card .primary-button{font-family:'DM Sans',sans-serif}
+@media(max-width:760px){.admin-page{padding:0 15px 35px}.admin-intro{margin:35px auto 20px}.admin-grid{grid-template-columns:1fr}.admin-card-wide{grid-column:auto}.publish-layout{grid-template-columns:1fr}.admin-card{padding:17px}.admin-form-row{grid-template-columns:1fr}.admin-header{height:65px}}
