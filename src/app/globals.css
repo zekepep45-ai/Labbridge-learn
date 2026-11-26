@@ -229,3 +229,6 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 }
 
 .plan-pill{border:1px solid #dcebe0;background:#edf5ef;color:#397455;border-radius:20px;padding:6px 9px;font-size:8px;font-weight:800;letter-spacing:.7px;white-space:nowrap}
+
+.course-language{font-size:8px;font-weight:800;letter-spacing:.8px;color:#477c64;background:#edf5ef;border:1px solid #dcebe0;border-radius:20px;padding:7px 10px;white-space:nowrap}
+@media(max-width:520px){.course-language{display:none}}
