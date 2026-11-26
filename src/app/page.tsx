@@ -191,10 +191,10 @@ export default function Home() {
         <div className="workspace-label">LEARNING SPACE</div>
         <nav className="main-nav" aria-label="Main navigation">
           <a className="nav-item active" href="#overview"><span className="nav-icon">▦</span> {t.overview}</a>
-          <a className="nav-item" href="/library"><span className="nav-icon">▣</span> Academic library</a>
+          <a className="nav-item" href="/library"><span className="nav-icon">▣</span> Academic library</a>\n          <a className="nav-item" href="/progress"><span className="nav-icon">◴</span> Assessment progress</a>
           <a className="nav-item" href="#courses"><span className="nav-icon">▤</span> {t.myCourses}</a>
           <a className="nav-item" href="#resources"><span className="nav-icon">▧</span> {t.studyResources}</a>
-          <a className="nav-item" href="#practice"><span className="nav-icon">◎</span> {t.practiceQuizzes}</a>
+          <a className="nav-item" href="/progress"><span className="nav-icon">◎</span> {t.practiceQuizzes}</a>
         </nav>
         <div className="sidebar-bottom"><div className="help-card"><div className="help-symbol">✦</div><strong>Keep your momentum</strong><p>Small study sessions add up. Make today count.</p><a href="#courses">Explore learning ↗</a></div><div className="sidebar-footer"><span className="status-dot"/> Your learning space <span>{countries.find((item) => item.code === countryCode)?.name || "Global"}</span></div></div>
       </aside>
