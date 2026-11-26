@@ -22,7 +22,7 @@ export default function AdminPage() {
   const [courseTitle, setCourseTitle] = useState("");
   const [courseSlug, setCourseSlug] = useState("");
   const [discipline, setDiscipline] = useState("Medical Laboratory Science");
-  const [level, setLevel] = useState("Level 100");
+  const [level, setLevel] = useState("Foundational");
   const [courseDescription, setCourseDescription] = useState("");
   const [moduleTitle, setModuleTitle] = useState("");
   const [moduleDescription, setModuleDescription] = useState("");
@@ -150,7 +150,7 @@ export default function AdminPage() {
       <section className="admin-card"><div className="admin-card-head"><span>01 / COURSE</span><h2>Create a course</h2></div><form onSubmit={createCourse} className="admin-form">
         <label>Course title<input required value={courseTitle} onChange={(e) => { setCourseTitle(e.target.value); setCourseSlug(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")); }} placeholder="Foundations of Medical Laboratory Science"/></label>
         <label>Course URL slug<input required value={courseSlug} onChange={(e) => setCourseSlug(e.target.value)} placeholder="foundations-of-mls"/></label>
-        <div className="admin-form-row"><label>Study level<select value={level} onChange={(e) => setLevel(e.target.value)}><option>Level 100</option><option>Level 200</option><option>Level 300</option><option>Level 400</option><option>Professional development</option></select></label><label>Discipline<input required value={discipline} onChange={(e) => setDiscipline(e.target.value)}/></label></div>
+        <div className="admin-form-row"><label>Study level<select value={level} onChange={(e) => setLevel(e.target.value)}><option>Foundational</option><option>Intermediate</option><option>Advanced</option><option>Professional development</option></select></label><label>Discipline<input required value={discipline} onChange={(e) => setDiscipline(e.target.value)}/></label></div>
         <label>Course description<textarea required rows={3} value={courseDescription} onChange={(e) => setCourseDescription(e.target.value)} placeholder="What will learners understand or be able to do?"/></label>
         <button className="primary-button" disabled={busy}>Save draft course →</button>
       </form></section>
