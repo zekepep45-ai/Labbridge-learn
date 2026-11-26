@@ -191,6 +191,7 @@ export default function Home() {
         <div className="workspace-label">LEARNING SPACE</div>
         <nav className="main-nav" aria-label="Main navigation">
           <a className="nav-item active" href="#overview"><span className="nav-icon">▦</span> {t.overview}</a>
+          <a className="nav-item" href="/library"><span className="nav-icon">▣</span> Academic library</a>
           <a className="nav-item" href="#courses"><span className="nav-icon">▤</span> {t.myCourses}</a>
           <a className="nav-item" href="#resources"><span className="nav-icon">▧</span> {t.studyResources}</a>
           <a className="nav-item" href="#practice"><span className="nav-icon">◎</span> {t.practiceQuizzes}</a>
