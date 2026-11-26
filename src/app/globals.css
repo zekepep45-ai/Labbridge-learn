@@ -216,7 +216,7 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 .app-shell[dir="rtl"] .sidebar{border-right:0;border-left:1px solid var(--line)}
 .app-shell[dir="rtl"] .sidebar-footer span:last-child{margin-left:0;margin-right:auto}
 .app-shell[dir="rtl"] .course-meta strong{margin-left:0;margin-right:auto}
-@media(max-width:900px){.country-preference{display:none}.top-preference select{max-width:58px}}
+@media(max-width:900px){.top-preference select,.country-preference select{max-width:58px}}
 @media(max-width:600px){
  .auth-preferences{width:100%;margin:12px 0 0}
  .auth-preferences label{flex:1}
@@ -224,7 +224,7 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
  .topbar{padding:0 14px}
  .top-actions{gap:6px}
  .welcome-label{display:none}
- .top-preference select{max-width:48px;padding:5px 3px}
+ .top-preference select,.country-preference select{max-width:48px;padding:5px 3px}
  .top-preference span{font-size:7px}
 }
 
