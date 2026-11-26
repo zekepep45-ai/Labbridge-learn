@@ -12,6 +12,8 @@ export default function AdminPage() {
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
   const [allowed, setAllowed] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [accessMessage, setAccessMessage] = useState("");
+  const [signedInEmail, setSignedInEmail] = useState("");
   const [courses, setCourses] = useState<Course[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -49,9 +51,16 @@ export default function AdminPage() {
     let active = true;
     async function init() {
       const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) { if (active) setChecking(false); return; }
-      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", auth.user.id);
+      if (!auth.user) { if (active) { setAccessMessage("No active sign-in session was found. Please sign in again."); setChecking(false); } return; }
+      if (active) setSignedInEmail(auth.user.email ?? "Email unavailable");
+      const { data: roles, error: roleError } = await supabase.from("user_roles").select("role").eq("user_id", auth.user.id);
+      if (roleError) {
+        if (active) setAccessMessage("We could not check your content role: " + roleError.message);
+        if (active) setChecking(false);
+        return;
+      }
       const canManage = (roles ?? []).some((item) => item.role === "admin" || item.role === "content_editor");
+      if (!canManage && active) setAccessMessage("This signed-in account does not have an administrator or content-editor role.");
       if (active && canManage) {
         setAllowed(true);
         await loadContent();
@@ -128,7 +137,7 @@ export default function AdminPage() {
   }
 
   if (checking) return <main className="loading-screen"><div className="loading-mark">L<span>+</span></div><p>Checking content team access…</p></main>;
-  if (!allowed) return <main className="admin-page"><div className="admin-card"><span className="admin-kicker">LABBRIDGE CONTENT STUDIO</span><h1>Access restricted</h1><p>This workspace is available only to authorised administrators and content editors.</p><Link href="/">Return to learning dashboard →</Link></div></main>;
+  if (!allowed) return <main className="admin-page"><div className="admin-card"><span className="admin-kicker">LABBRIDGE CONTENT STUDIO</span><h1>Access restricted</h1><p>This workspace is available only to authorised administrators and content editors.</p>{accessMessage && <p className="admin-feedback">{accessMessage}</p>}<p>Signed in as: <strong>{signedInEmail || "Not signed in"}</strong></p><p>If this is not your administrator email, sign out and use the account that was granted access.</p><Link href="/">Return to learning dashboard →</Link></div></main>;
 
   const activeCourse = courses.find((item) => item.id === selectedCourse);
   const availableModules = modules.filter((item) => item.course_id === selectedCourse);
