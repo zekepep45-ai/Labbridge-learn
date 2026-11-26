@@ -146,6 +146,19 @@ export default function VirtualLabPage() {
         <div className="vl-safety"><span>✳</span><div><strong>Educational simulation only</strong><small>These are fictional training scenarios, not real patient samples or clinical instructions. Always follow your institution&apos;s approved SOPs and supervisor guidance.</small></div></div>
       </section>
 
+      <section style={{ maxWidth: 1120, margin: "0 auto 18px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 12 }}>
+        <Link href="/virtual-lab" style={{ display: "block", padding: "15px 17px", border: "1px solid #dce9df", borderRadius: 10, background: "#fff", color: "#315b45", textDecoration: "none" }}>
+          <span style={{ display: "block", fontSize: 8, letterSpacing: 1, fontWeight: 800, color: "#7d9686" }}>SIMULATION 01 · SPECIMEN RECEPTION</span>
+          <strong style={{ display: "block", marginTop: 6, fontSize: 12 }}>Specimen Reception &amp; Acceptance</strong>
+          <small style={{ display: "block", marginTop: 4, fontSize: 9, color: "#87968c" }}>Patient identification and specimen suitability</small>
+        </Link>
+        <Link href="/virtual-lab/haematology" style={{ display: "block", padding: "15px 17px", border: "1px solid #cfe2d4", borderRadius: 10, background: "#edf6ef", color: "#315b45", textDecoration: "none" }}>
+          <span style={{ display: "block", fontSize: 8, letterSpacing: 1, fontWeight: 800, color: "#578166" }}>SIMULATION 02 · NEW</span>
+          <strong style={{ display: "block", marginTop: 6, fontSize: 12 }}>Haematology: CBC Interpretation</strong>
+          <small style={{ display: "block", marginTop: 4, fontSize: 9, color: "#718b79" }}>Interpret indices, differentials and analyser flags →</small>
+        </Link>
+      </section>
+
       <section className="vl-workspace">
         <aside className="vl-sidebar">
           <div className="vl-side-heading"><span>YOUR PRACTICAL SESSION</span><strong>{finished ? "5 / 5" : (stationIndex + 1) + " / " + stations.length}</strong></div>
