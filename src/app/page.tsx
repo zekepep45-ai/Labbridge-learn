@@ -35,17 +35,19 @@ export default function Home() {
   const [language, setLanguage] = useState<SupportedLocale>("en");
   const [countryCode, setCountryCode] = useState("GH");
   const [countries, setCountries] = useState<Country[]>([]);
+  const [planCode, setPlanCode] = useState("free");
   const preferenceChoice = useRef({ language: "en" as SupportedLocale, countryCode: "GH" });
   const t = getMessages(language);
 
   async function loadLearningSpace(currentUser: User) {
-    const [{ data: profileData }, { data: courseData }, { data: enrollmentData }, { data: progressData }, { data: preferenceData }, { data: countryData }] = await Promise.all([
+    const [{ data: profileData }, { data: courseData }, { data: enrollmentData }, { data: progressData }, { data: preferenceData }, { data: countryData }, { data: subscriptionData }] = await Promise.all([
       supabase.from("profiles").select("full_name, student_number").eq("id", currentUser.id).maybeSingle(),
       supabase.from("courses").select("id, title, slug, description, discipline, level, cover_image_url").eq("status", "published").order("created_at", { ascending: false }),
       supabase.from("enrollments").select("course_id").eq("user_id", currentUser.id),
       supabase.from("learning_progress").select("id, completion_percent").eq("user_id", currentUser.id),
       supabase.from("user_preferences").select("preferred_language,country_code").eq("user_id", currentUser.id).maybeSingle(),
-      supabase.from("countries").select("code,name,default_language_code").eq("is_enabled", true).order("name")
+      supabase.from("countries").select("code,name,default_language_code").eq("is_enabled", true).order("name"),
+      supabase.from("user_subscriptions").select("plan_code").eq("user_id", currentUser.id).in("status", ["active", "trialing"]).maybeSingle()
     ]);
 
     if (profileData) setProfile(profileData);
@@ -65,6 +67,12 @@ export default function Home() {
       await supabase.from("user_preferences").upsert({ user_id: currentUser.id, preferred_language: choice.language, country_code: choice.countryCode }, { onConflict: "user_id" });
     }
     setCountries((countryData ?? []) as Country[]);
+    let activePlan = subscriptionData?.plan_code as string | undefined;
+    if (!activePlan) {
+      const { data: newSubscription } = await supabase.from("user_subscriptions").insert({ user_id: currentUser.id, plan_code: "free", status: "active" }).select("plan_code").single();
+      activePlan = newSubscription?.plan_code;
+    }
+    setPlanCode(activePlan || "free");
     setCourses(courseData ?? []);
     setEnrolled((enrollmentData ?? []).map((item) => item.course_id));
     setCompletedLessons((progressData ?? []).filter((item) => item.completion_percent >= 100).length);
@@ -190,7 +198,7 @@ export default function Home() {
         <div className="sidebar-bottom"><div className="help-card"><div className="help-symbol">✦</div><strong>Keep your momentum</strong><p>Small study sessions add up. Make today count.</p><a href="#courses">Explore learning ↗</a></div><div className="sidebar-footer"><span className="status-dot"/> Your learning space <span>Ghana</span></div></div>
       </aside>
       <section className="main-area" id="overview">
-        <header className="topbar"><div className="breadcrumb">LabBridge <span>/</span> <strong>Overview</strong></div><div className="top-actions"><label className="top-preference"><span>{t.language}</span><select value={language} onChange={(e) => void savePreferences(e.target.value as SupportedLocale, countryCode)}><option value="en">EN</option><option value="fr">FR</option><option value="pt">PT</option><option value="ar">AR</option><option value="sw">SW</option><option value="es">ES</option></select></label><label className="top-preference country-preference"><span>{t.country}</span><select value={countryCode} onChange={(e) => void savePreferences(language, e.target.value)}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><span className="welcome-label">{user.email}</span><div className="avatar">{displayName.split(" ").map((part) => part[0]).slice(0,2).join("").toUpperCase()}</div><button className="signout-button" onClick={signOut}>{t.signOut}</button></div></header>
+        <header className="topbar"><div className="breadcrumb">LabBridge <span>/</span> <strong>Overview</strong></div><div className="top-actions"><label className="top-preference"><span>{t.language}</span><select value={language} onChange={(e) => void savePreferences(e.target.value as SupportedLocale, countryCode)}><option value="en">EN</option><option value="fr">FR</option><option value="pt">PT</option><option value="ar">AR</option><option value="sw">SW</option><option value="es">ES</option></select></label><label className="top-preference country-preference"><span>{t.country}</span><select value={countryCode} onChange={(e) => void savePreferences(language, e.target.value)}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><span className="plan-pill">{planCode.toUpperCase()}</span><span className="welcome-label">{user.email}</span><div className="avatar">{displayName.split(" ").map((part) => part[0]).slice(0,2).join("").toUpperCase()}</div><button className="signout-button" onClick={signOut}>{t.signOut}</button></div></header>
         <div className="content">
           <section className="welcome-row"><div><div className="eyebrow"><span className="eyebrow-line"/> YOUR MLS LEARNING JOURNEY</div><h1>{t.welcome}, {firstName}.<br/><em>{t.keepGrowing}</em></h1><p className="intro">{t.journeyIntro}</p></div><div className="welcome-art" aria-hidden="true"><div className="art-orbit orbit-one"/><div className="art-orbit orbit-two"/><div className="art-cross">+</div><div className="art-core"><span>LAB</span><strong>✳</strong><span>LEARN</span></div><div className="art-dot dot-one"/><div className="art-dot dot-two"/><div className="art-dot dot-three"/></div></section>
           <section className="stats-grid" aria-label="Learning summary"><div className="stat-card"><span className="stat-icon green">▤</span><div><strong>{myCourses.length.toString().padStart(2,"0")}</strong><span>{t.coursesEnrolled}</span></div><small>LIVE</small></div><div className="stat-card"><span className="stat-icon violet">◷</span><div><strong>{completedLessons.toString().padStart(2,"0")}</strong><span>{t.lessonsCompleted}</span></div><small>PROGRESS</small></div><div className="stat-card"><span className="stat-icon amber">✧</span><div><strong>{courses.length.toString().padStart(2,"0")}</strong><span>{t.publishedCourses}</span></div><small>AVAILABLE</small></div></section>
