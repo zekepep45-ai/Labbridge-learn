@@ -186,3 +186,9 @@ ${curriculumContext || "No published lesson excerpts are currently available for
         "X-LabBridge-Quota-Limit": String(quota.limit ?? 10)
       }
     });
+
+  } catch (error) {
+    console.error("LabBridge AI Tutor request failed:", error);
+    return jsonError("The AI Tutor could not process that request. Please try again.", 500);
+  }
+}
