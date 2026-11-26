@@ -227,3 +227,5 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
  .top-preference select{max-width:48px;padding:5px 3px}
  .top-preference span{font-size:7px}
 }
+
+.plan-pill{border:1px solid #dcebe0;background:#edf5ef;color:#397455;border-radius:20px;padding:6px 9px;font-size:8px;font-weight:800;letter-spacing:.7px;white-space:nowrap}
