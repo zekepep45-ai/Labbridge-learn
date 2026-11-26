@@ -22,6 +22,8 @@ export default function QuizPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [attempts, setAttempts] = useState(0);
+  const [deadlineMs, setDeadlineMs] = useState<number | null>(null);
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -49,6 +51,7 @@ export default function QuizPage() {
       ]);
       if (!active) return;
       setQuiz({ ...assessment, title: assessment.title, description: (assessment.description || (course?.title ? "Practice assessment for " + course.title : assessment.description)) });
+      if (assessment.time_limit_minutes) setDeadlineMs(Date.now() + assessment.time_limit_minutes * 60 * 1000);
       setQuestions(ordered);
       setAttempts(history?.length ?? 0);
       setLoading(false);
@@ -56,6 +59,18 @@ export default function QuizPage() {
     void load();
     return () => { active = false; };
   }, [params.id, supabase]);
+
+  useEffect(() => {
+    if (!deadlineMs || result) return;
+    const update = () => {
+      const seconds = Math.max(0, Math.ceil((deadlineMs - Date.now()) / 1000));
+      setRemainingSeconds(seconds);
+      if (seconds === 0) setMessage("The suggested exam time has ended. Submit your answers when ready; unanswered questions must still be completed.");
+    };
+    update();
+    const timer = window.setInterval(update, 1000);
+    return () => window.clearInterval(timer);
+  }, [deadlineMs, result]);
 
   async function submit() {
     if (!quiz || questions.some((question) => !answers[question.id])) {
@@ -79,7 +94,7 @@ export default function QuizPage() {
 
   return <main className="quiz-page">
     <header className="admin-header"><Link href="/library" className="brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>LEARN</small></span></Link><Link href="/library">← Academic Library</Link></header>
-    <section className="quiz-hero"><span className="admin-kicker">PRACTICE ASSESSMENT</span><h1>{quiz.title}</h1><p>{quiz.description}</p><div className="quiz-meta"><span>{questions.length} questions</span><span>Pass mark: {quiz.pass_mark}%</span><span>Attempt {attempts + 1}{quiz.max_attempts ? " of " + quiz.max_attempts : ""}</span>{quiz.time_limit_minutes && <span>{quiz.time_limit_minutes} minutes</span>}</div></section>
+    <section className="quiz-hero"><span className="admin-kicker">PRACTICE ASSESSMENT</span><h1>{quiz.title}</h1><p>{quiz.description}</p><div className="quiz-meta"><span>{questions.length} questions</span><span>Pass mark: {quiz.pass_mark}%</span><span>Attempt {attempts + 1}{quiz.max_attempts ? " of " + quiz.max_attempts : ""}</span>{quiz.time_limit_minutes && <span>{quiz.time_limit_minutes} minutes</span>}{remainingSeconds !== null && <span className={remainingSeconds <= 60 ? "quiz-timer urgent" : "quiz-timer"}>Time remaining: {String(Math.floor(remainingSeconds / 60)).padStart(2,"0")}:{String(remainingSeconds % 60).padStart(2,"0")}</span>}</div></section>
     {result ? <section className="quiz-result">
       <div className="quiz-score"><span>{result.passed ? "ASSESSMENT PASSED" : "KEEP PRACTISING"}</span><strong>{result.percentage}%</strong><small>{result.score} / {result.total_points} points · Pass mark {result.pass_mark}%</small></div>
       <h2>Review your answers</h2><p className="quiz-result-intro">Read the explanations and references to strengthen your understanding.</p>
@@ -96,7 +111,7 @@ export default function QuizPage() {
       })}
       <div className="quiz-result-actions"><Link href="/library">Return to Academic Library →</Link>{(!quiz.max_attempts || attempts < quiz.max_attempts) && <button className="primary-button" onClick={() => { setResult(null); setAnswers({}); setMessage(""); }}>Try again</button>}</div>
     </section> : <section className="quiz-questions">
-      <div className="quiz-instructions"><strong>Before you begin</strong><p>Select one best answer for each question. Your score and explanations will appear after submission. You can review your choices before submitting.</p></div>
+      <div className="quiz-instructions"><strong>Before you begin</strong><p>Select one best answer for each question. Your score and explanations will appear after submission. You can review your choices before submitting. The countdown is a study aid; it does not automatically submit your answers.</p></div>
       {questions.map((question,index) => <article className="quiz-question-card" key={question.id}>
         <div className="quiz-question-heading"><span>QUESTION {String(index+1).padStart(2,"0")} / {questions.length}</span><small>{question.difficulty}</small></div>
         <h2>{question.stem}</h2>
