@@ -13,7 +13,8 @@
     "next": "15.5.29",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "ai": "7.0.183"
+    "ai": "7.0.183",
+    "@ai-sdk/google": "7.0.0"
   },
   "devDependencies": {
     "@types/node": "22.15.30",
