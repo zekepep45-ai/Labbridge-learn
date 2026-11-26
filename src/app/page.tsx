@@ -51,8 +51,8 @@ export default function Home() {
       const { data } = await supabase.from("profiles").upsert({ id: currentUser.id, full_name: name }, { onConflict: "id" }).select("full_name, student_number").maybeSingle();
       setProfile(data ?? { full_name: name, student_number: null });
     }
-    setLanguage((preferenceData?.preferred_language as SupportedLocale) || "en");
-    setCountryCode(preferenceData?.country_code || "GH");
+    if (preferenceData?.preferred_language) setLanguage(preferenceData.preferred_language as SupportedLocale);
+    if (preferenceData?.country_code) setCountryCode(preferenceData.country_code);
     setCountries((countryData ?? []) as Country[]);
     setCourses(courseData ?? []);
     setEnrolled((enrollmentData ?? []).map((item) => item.course_id));
@@ -61,6 +61,7 @@ export default function Home() {
 
   useEffect(() => {
     let active = true;
+    supabase.from("countries").select("code,name,default_language_code").eq("is_enabled", true).order("name").then(({ data }) => { if (active && data) setCountries(data as Country[]); });
     supabase.auth.getSession().then(async ({ data }) => {
       if (!active) return;
       setUser(data.session?.user ?? null);
