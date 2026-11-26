@@ -157,6 +157,9 @@ export default function VirtualLabPage() {
           <strong style={{ display: "block", marginTop: 6, fontSize: 12 }}>Haematology: CBC Interpretation</strong>
           <small style={{ display: "block", marginTop: 4, fontSize: 9, color: "#718b79" }}>Interpret indices, differentials and analyser flags →</small>
         </Link>
+      <Link href="/virtual-lab/clinical-biochemistry" style={{display:"block",padding:"15px 17px",border:"1px solid #dce9df",borderRadius:10,background:"#fff",color:"#315b45",textDecoration:"none"}}><span style={{display:"block",fontSize:8,letterSpacing:1,fontWeight:800,color:"#7d9686"}}>SIMULATION 03</span><strong style={{display:"block",marginTop:6,fontSize:12}}>Clinical Biochemistry</strong><small style={{display:"block",marginTop:4,fontSize:9,color:"#87968c"}}>Chemistry profiles and analytical quality →</small></Link>
+        <Link href="/virtual-lab/microbiology" style={{display:"block",padding:"15px 17px",border:"1px solid #dce9df",borderRadius:10,background:"#fff",color:"#315b45",textDecoration:"none"}}><span style={{display:"block",fontSize:8,letterSpacing:1,fontWeight:800,color:"#7d9686"}}>SIMULATION 04</span><strong style={{display:"block",marginTop:6,fontSize:12}}>Medical Microbiology</strong><small style={{display:"block",marginTop:4,fontSize:9,color:"#87968c"}}>Culture, microscopy and AST concepts →</small></Link>
+        <Link href="/virtual-lab/parasitology" style={{display:"block",padding:"15px 17px",border:"1px solid #dce9df",borderRadius:10,background:"#fff",color:"#315b45",textDecoration:"none"}}><span style={{display:"block",fontSize:8,letterSpacing:1,fontWeight:800,color:"#7d9686"}}>SIMULATION 05</span><strong style={{display:"block",marginTop:6,fontSize:12}}>Parasitology</strong><small style={{display:"block",marginTop:4,fontSize:9,color:"#87968c"}}>Microscopy and parasite identification →</small></Link>
       </section>
 
       <section className="vl-workspace">

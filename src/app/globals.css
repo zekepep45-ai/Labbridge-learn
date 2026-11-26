@@ -511,3 +511,24 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 .vl-footer{max-width:1120px;margin:25px auto 0;padding-top:15px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:8px;color:#9aa59f}
 @media(max-width:760px){.virtual-lab-page{padding:0 16px 24px}.vl-header{height:65px}.vl-header-right{gap:10px;font-size:9px}.vl-mode{font-size:7px;padding:7px}.vl-hero{padding:35px 0 20px}.vl-workspace{grid-template-columns:1fr}.vl-sidebar{position:static;padding:14px}.vl-station-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}.vl-station-item{padding:7px 5px;gap:7px}.vl-station-item strong{font-size:8px}.vl-side-note{display:none}.vl-bench{padding:17px;min-height:0}.vl-case-card{padding:14px}.vl-bench-top{font-size:8px}.vl-footer{font-size:7px}}
 @media(max-width:430px){.vl-header-right{gap:7px}.vl-mode{letter-spacing:.5px}.vl-station-list{grid-template-columns:1fr 1fr}.vl-station-item small{font-size:7px}.vl-option{font-size:9px;padding:10px}.vl-option b{font-size:7px}.vl-specimen-copy strong{font-size:12px}.vl-footer{flex-direction:column;gap:7px}}
+
+
+/* Batch 2 learning workspace */
+.study-feature-grid,.study-course-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:25px 0 42px}
+.study-feature,.study-course,.community-compose,.community-post{background:#fff;border:1px solid var(--line);border-radius:13px;padding:21px}
+.study-feature>span,.study-course>small{font-size:9px;letter-spacing:1.2px;font-weight:800;color:#72917d}
+.study-feature h2{font-size:18px;margin:15px 0 9px}.study-feature p,.study-course p{font-size:11px;line-height:1.8;color:#7d8b84}
+.study-feature a,.study-course a{font-size:10px;font-weight:700;color:var(--green)}
+.study-section{max-width:1120px;margin:0 auto 38px;padding:0 22px}
+.study-course h3{font:700 15px Manrope;margin:12px 0 8px}.study-course p{min-height:52px}
+.exam-meta{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0 17px}.exam-meta span{font-size:8px;color:#718078;background:#f0f5f1;border-radius:20px;padding:6px 8px}
+.community-layout{max-width:1120px;margin:0 auto 45px;padding:0 22px;display:grid;grid-template-columns:minmax(270px,.8fr) minmax(0,1.2fr);gap:18px;align-items:start}
+.community-compose{display:grid;gap:13px;position:sticky;top:20px}.community-compose h2{font-size:18px}
+.community-compose label{display:grid;gap:6px;font-size:10px;font-weight:700;color:#53655c}
+.community-compose input,.community-compose select,.community-compose textarea,.community-reply-form input{width:100%;border:1px solid #dfe9e2;border-radius:8px;padding:11px;font:12px 'DM Sans',sans-serif;color:var(--ink);background:#fcfdfb}
+.community-compose textarea{resize:vertical}.community-compose>small{font-size:9px;line-height:1.6;color:#8a9690}
+.community-feed{min-width:0}.community-post{margin:13px 0}.community-post-meta{display:flex;justify-content:space-between;gap:10px;font-size:8px;color:#84928a}.community-post-meta span{color:#39775d;font-weight:800;text-transform:uppercase;letter-spacing:.8px}
+.community-post h3{font:700 16px Manrope;margin:13px 0 8px}.community-post>p{font-size:11px;line-height:1.8;color:#687970;white-space:pre-wrap}
+.community-replies{border-top:1px solid #edf1ed;margin-top:15px}.community-reply{padding:11px 0;border-bottom:1px solid #f0f3f0}.community-reply small{font-size:8px;color:#8a9a90;font-weight:700}.community-reply p{font-size:10px;line-height:1.7;margin:6px 0 0;color:#53665c;white-space:pre-wrap}
+.community-reply-form{display:flex;gap:8px;margin-top:13px}.community-reply-form button{border:0;border-radius:8px;background:var(--green);color:white;padding:0 14px;font-size:10px;font-weight:700}.community-reply-form button:disabled{opacity:.5}
+@media(max-width:760px){.study-feature-grid,.study-course-grid{grid-template-columns:1fr}.community-layout{grid-template-columns:1fr}.community-compose{position:static}.study-section{padding:0 15px}.community-layout{padding:0 15px}.community-post-meta{flex-direction:column}}
