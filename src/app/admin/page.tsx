@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [checking, setChecking] = useState(true);
   const [accessMessage, setAccessMessage] = useState("");
   const [signedInEmail, setSignedInEmail] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
   const [courses, setCourses] = useState<Course[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -30,7 +31,6 @@ export default function AdminPage() {
   const [lessonSummary, setLessonSummary] = useState("");
   const [lessonMinutes, setLessonMinutes] = useState("10");
   const [lessonContent, setLessonContent] = useState("");
-  const [reviewConfirmed, setReviewConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -52,7 +52,7 @@ export default function AdminPage() {
     async function init() {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { if (active) { setAccessMessage("No active sign-in session was found. Please sign in again."); setChecking(false); } return; }
-      if (active) setSignedInEmail(auth.user.email ?? "Email unavailable");
+      if (active) { setSignedInEmail(auth.user.email ?? "Email unavailable"); setCurrentUserId(auth.user.id); }
       const { data: roles, error: roleError } = await supabase.from("user_roles").select("role").eq("user_id", auth.user.id);
       if (roleError) {
         if (active) setAccessMessage("We could not check your content role: " + roleError.message);
@@ -115,6 +115,36 @@ export default function AdminPage() {
     setBusy(false);
   }
 
+
+  async function submitCourseForReview() {
+    if (!selectedCourse || !currentUserId) return;
+    const courseModules = modules.filter((item) => item.course_id === selectedCourse);
+    if (!courseModules.length) { setMessage("Add at least one module before submitting for review."); return; }
+    const moduleIds = courseModules.map((item) => item.id);
+    const courseLessons = lessons.filter((item) => moduleIds.includes(item.module_id));
+    if (!courseLessons.length) { setMessage("Add at least one lesson before submitting for review."); return; }
+    setBusy(true); setMessage("");
+    const items = [
+      { item_type: "course", item_id: selectedCourse, submitted_by: currentUserId },
+      ...courseModules.map((item) => ({ item_type: "module", item_id: item.id, submitted_by: currentUserId })),
+      ...courseLessons.map((item) => ({ item_type: "lesson", item_id: item.id, submitted_by: currentUserId }))
+    ];
+    const itemIds = items.map((item) => item.item_id);
+    const { data: existing, error: lookupError } = await supabase.from("academic_content_reviews")
+      .select("item_id").eq("status", "pending").in("item_id", itemIds);
+    if (lookupError) { setMessage("Could not check existing review submissions: " + lookupError.message); setBusy(false); return; }
+    const pendingIds = new Set((existing ?? []).map((item) => item.item_id));
+    const freshItems = items.filter((item) => !pendingIds.has(item.item_id));
+    if (!freshItems.length) { setMessage("This course already has pending academic review submissions."); setBusy(false); return; }
+    const { error } = await supabase.from("academic_content_reviews").insert(freshItems);
+    if (error) setMessage("Could not submit content for review: " + error.message);
+    else {
+      setMessage("Submitted " + freshItems.length + " course, module and lesson item(s) for academic review. Publication remains locked until every item is approved.");
+      await loadContent();
+    }
+    setBusy(false);
+  }
+
   async function publishCourse() {
     if (!selectedCourse || !reviewConfirmed) {
       setMessage("Confirm academic review before publishing.");
@@ -169,7 +199,7 @@ export default function AdminPage() {
       </form></section>
       <section className="admin-card admin-card-wide"><div className="admin-card-head"><span>04 / REVIEW & PUBLISH</span><h2>Review course status</h2></div>
         <div className="publish-layout"><div><label>Course to review<select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}><option value="">Select a course</option>{courses.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>{activeCourse && <div className="content-outline"><div><span>COURSE</span><strong>{activeCourse.title}</strong><small>{activeCourse.status.toUpperCase()}</small></div>{availableModules.map((mod) => <div className="outline-child" key={mod.id}><span>MODULE</span><strong>{mod.title}</strong><small>{mod.status.toUpperCase()}</small>{lessons.filter((lesson) => lesson.module_id === mod.id).map((lesson) => <p key={lesson.id}>↳ {lesson.title} <small>{lesson.status.toUpperCase()}</small></p>)}</div>)}</div>}</div>
-        <div className="publish-check"><p>Before publishing, confirm the content has been checked for scientific accuracy, appropriate references, clear learning objectives, international academic standards and relevant clinical context.</p><label className="review-check"><input type="checkbox" checked={reviewConfirmed} onChange={(e) => setReviewConfirmed(e.target.checked)}/> I confirm this course has completed academic review.</label><button className="primary-button" disabled={busy || !activeCourse || activeCourse.status === "published" || !reviewConfirmed} onClick={publishCourse}>Publish course to students ↗</button><small>Publishing makes its modules and lessons visible to signed-in learners.</small></div></div>
+        <div className="publish-check"><p>Submit the course, its modules and its lessons to the academic review queue. A reviewer must approve every item before the course can be published to learners.</p><button className="primary-button" disabled={busy || !activeCourse || activeCourse.status === "published"} onClick={submitCourseForReview}>Submit course for academic review →</button><p>After all review decisions are approved, an authorised content administrator can publish the course.</p><button className="primary-button" disabled={busy || !activeCourse || activeCourse.status === "published"} onClick={publishCourse}>Publish approved course to students ↗</button><small>Database safeguards block publication if any course, module or lesson has not been approved.</small></div></div>
       </section>
     </div>
     {message && <p className="admin-feedback" role="status">{message}</p>}
