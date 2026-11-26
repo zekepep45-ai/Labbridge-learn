@@ -42,7 +42,7 @@ export default function AcademicLibraryPage() {
       const admin = (roleRows ?? []).some((row) => ["admin", "content_editor"].includes(row.role));
       if (active) setIsAdmin(admin);
 
-      let courseQuery = supabase.from("courses")
+      const courseQuery = supabase.from("courses")
         .select("id,title,slug,description,discipline,level,status,created_at")
         .order("title");
       const { data, error: courseError } = await courseQuery;
