@@ -553,3 +553,21 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 @media(max-width:760px){.vl-main-panel{padding:16px}.vl-case-top{font-size:8px}.vl-controls{align-items:stretch;flex-direction:column}.vl-controls .vl-submit{width:100%}}
 
 .dashboard-tools{margin:0 0 42px}.dashboard-tools-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.dashboard-tools-grid a{display:flex;flex-direction:column;gap:7px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:15px;transition:border-color .2s,transform .2s}.dashboard-tools-grid a:hover{border-color:#b9d4c1;transform:translateY(-2px)}.dashboard-tools-grid a>span{width:31px;height:31px;border-radius:9px;background:#edf5ef;color:var(--green);display:grid;place-items:center;font-size:16px}.dashboard-tools-grid strong{font:700 11px Manrope}.dashboard-tools-grid small{font-size:9px;color:#87958e}@media(max-width:760px){.dashboard-tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:390px){.dashboard-tools-grid{grid-template-columns:1fr}}
+
+/* Batch 3: search, filters, learner achievements */
+.study-filters,.community-filters{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 20px}
+.study-filters input,.study-filters select,.community-filters input,.community-filters select{min-width:190px;flex:1;border:1px solid #dfe9e2;border-radius:9px;background:#fff;padding:11px 13px;color:var(--ink);font:11px 'DM Sans',sans-serif}
+.community-filters{margin-top:18px}.community-filters input{flex:2}
+.community-owner-actions{display:flex;gap:8px;margin-top:9px}
+.community-owner-actions button,.community-edit button{border:1px solid #dce8df;border-radius:7px;background:#f8fbf8;color:#496c56;padding:6px 10px;font-size:9px;font-weight:700}
+.community-edit{display:grid;gap:8px;margin:10px 0}.community-edit input,.community-edit textarea{width:100%;border:1px solid #dfe9e2;border-radius:8px;padding:10px;font:11px 'DM Sans',sans-serif;color:var(--ink)}
+.community-edit button{justify-self:start}
+.progress-practical-stats{margin-top:14px}
+.progress-achievements{margin-top:22px;padding:22px;background:#fff;border:1px solid var(--line);border-radius:13px}
+.achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-top:18px}
+.achievement-card{display:flex;align-items:center;gap:10px;border:1px solid #e5ece6;border-radius:10px;padding:13px;min-width:0}
+.achievement-card>span{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:9px;background:#eef5ef;color:#477b5d;font-size:16px}
+.achievement-card>div{display:grid;gap:4px;min-width:0}.achievement-card strong{font:700 10px Manrope}.achievement-card small{font-size:8px;line-height:1.5;color:#849188}
+.achievement-card>b{margin-left:auto;font-size:7px;letter-spacing:.5px;color:#7b9182}
+.achievement-card.locked{opacity:.55;background:#fafbfa}.achievement-card.earned{border-color:#cfe2d3;background:#f8fcf8}
+@media(max-width:760px){.achievement-grid{grid-template-columns:1fr}.study-filters,.community-filters{flex-direction:column}.study-filters input,.study-filters select,.community-filters input,.community-filters select{width:100%}}

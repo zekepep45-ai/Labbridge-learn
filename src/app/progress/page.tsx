@@ -89,6 +89,17 @@ export default function LearningProgressPage() {
   const passed = attempts.filter((row) => row.passed).length;
   const best = attempts.length ? Math.max(...attempts.map((row) => Number(row.percentage || 0))) : 0;
   const weakest = topicStats.filter((row) => row.total >= 2).slice(0, 3);
+  const practicalAverage = practicalAttempts.length ? Math.round(practicalAttempts.reduce((sum, row) => sum + row.score, 0) / practicalAttempts.length) : 0;
+  const practicalBest = practicalAttempts.length ? Math.max(...practicalAttempts.map(row => row.score)) : 0;
+  const milestones = [
+    { title: "First assessment", detail: "Complete your first graded assessment", earned: attempts.length >= 1, icon: "✎" },
+    { title: "Assessment explorer", detail: "Complete five graded assessments", earned: attempts.length >= 5, icon: "◎" },
+    { title: "Practical learner", detail: "Complete your first virtual lab", earned: practicalAttempts.length >= 1, icon: "⚗" },
+    { title: "Lab regular", detail: "Complete five virtual lab simulations", earned: practicalAttempts.length >= 5, icon: "✳" },
+    { title: "High achiever", detail: "Score 80% or higher in an assessment", earned: attempts.some(row => Number(row.percentage) >= 80), icon: "★" },
+    { title: "Practical excellence", detail: "Score 80% or higher in a simulation", earned: practicalAttempts.some(row => row.score >= 80), icon: "🏅" }
+  ];
+  const earnedMilestones = milestones.filter(item => item.earned).length;
 
   return <main className="progress-page">
     <header className="admin-header">
@@ -106,6 +117,16 @@ export default function LearningProgressPage() {
       <article className="progress-stat"><span>AVERAGE SCORE</span><strong>{average}%</strong><small>Across all completed attempts</small></article>
       <article className="progress-stat"><span>ASSESSMENTS PASSED</span><strong>{passed}</strong><small>{attempts.length ? Math.round(passed / attempts.length * 100) : 0}% pass rate</small></article>
       <article className="progress-stat"><span>PERSONAL BEST</span><strong>{best}%</strong><small>Highest assessment score</small></article>
+    </section>
+    <section className="progress-stat-grid progress-practical-stats">
+      <article className="progress-stat"><span>PRACTICAL SESSIONS</span><strong>{practicalAttempts.length}</strong><small>Completed simulations</small></article>
+      <article className="progress-stat"><span>PRACTICAL AVERAGE</span><strong>{practicalAverage}%</strong><small>Across completed simulations</small></article>
+      <article className="progress-stat"><span>PRACTICAL BEST</span><strong>{practicalBest}%</strong><small>Highest simulation score</small></article>
+      <article className="progress-stat"><span>ACHIEVEMENTS</span><strong>{earnedMilestones}/{milestones.length}</strong><small>Learning milestones earned</small></article>
+    </section>
+    <section className="progress-panel progress-achievements">
+      <div className="section-heading compact"><div><div className="eyebrow">YOUR MILESTONES</div><h2>Achievements</h2></div><span className="progress-count">{earnedMilestones} of {milestones.length} earned</span></div>
+      <div className="achievement-grid">{milestones.map(item=><article className={"achievement-card "+(item.earned?"earned":"locked")} key={item.title}><span>{item.icon}</span><div><strong>{item.title}</strong><small>{item.detail}</small></div><b>{item.earned?"EARNED":"LOCKED"}</b></article>)}</div>
     </section>
     <section className="progress-content-grid">
       <div className="progress-panel">
