@@ -48,10 +48,12 @@ export default function Home() {
       supabase.from("learning_progress").select("id, completion_percent").eq("user_id", currentUser.id),
       supabase.from("user_preferences").select("preferred_language,country_code").eq("user_id", currentUser.id).maybeSingle(),
       supabase.from("countries").select("code,name,default_language_code").eq("is_enabled", true).order("name"),
-      supabase.from("user_subscriptions").select("plan_code").eq("user_id", currentUser.id).in("status", ["active", "trialing"]).maybeSingle()
+      supabase.from("user_subscriptions").select("plan_code").eq("user_id", currentUser.id).in("status", ["active", "trialing"]).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", currentUser.id)
     ]);
 
-    setCanReviewAcademicContent((roleRows ?? []).some((item) => ["admin", "academic_reviewer"].includes(item.role)));\n    if (profileData) setProfile(profileData);
+    setCanReviewAcademicContent((roleRows ?? []).some((item) => ["admin", "academic_reviewer"].includes(item.role)));
+    if (profileData) setProfile(profileData);
     else {
       const name = (currentUser.user_metadata?.full_name as string | undefined) ?? "";
       const { data } = await supabase.from("profiles").upsert({ id: currentUser.id, full_name: name }, { onConflict: "id" }).select("full_name, student_number").maybeSingle();
