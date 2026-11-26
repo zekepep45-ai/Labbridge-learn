@@ -162,7 +162,7 @@ export default function AdminPage() {
     if (lessonResult.error) { setMessage("Could not publish lessons: " + lessonResult.error.message); setBusy(false); return; }
     const courseResult = await supabase.from("courses").update({ status: "published" }).eq("id", selectedCourse);
     if (courseResult.error) setMessage("Content prepared, but course publication failed: " + courseResult.error.message);
-    else { setMessage("Course published. It is now visible in the student learning library."); setReviewConfirmed(false); }
+    else { setMessage("Course published. It is now visible in the student learning library."); }
     await loadContent(); setBusy(false);
   }
 
