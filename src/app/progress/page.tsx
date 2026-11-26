@@ -9,6 +9,7 @@ type Assessment = { id: string; title: string; course_id: string };
 type Course = { id: string; title: string };
 type Response = { attempt_id: string; question_id: string; is_correct: boolean };
 type Question = { id: string; stem: string; tags: string[] | null };
+type PracticalAttempt = { id: string; simulation_slug: string; score: number; correct_count: number; total_stations: number; completed_at: string };
 
 export default function LearningProgressPage() {
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
@@ -17,6 +18,7 @@ export default function LearningProgressPage() {
   const [assessments, setAssessments] = useState<Record<string, Assessment>>({});
   const [courses, setCourses] = useState<Record<string, Course>>({});
   const [topicStats, setTopicStats] = useState<{ topic: string; correct: number; total: number }[]>([]);
+  const [practicalAttempts, setPracticalAttempts] = useState<PracticalAttempt[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -32,6 +34,12 @@ export default function LearningProgressPage() {
         .order("submitted_at", { ascending: false });
       if (attemptError) { if (active) { setError(attemptError.message); setLoading(false); } return; }
       const rows = (attemptRows ?? []) as Attempt[];
+      const { data: practicalRows, error: practicalError } = await supabase
+        .from("virtual_lab_attempts")
+        .select("id,simulation_slug,score,correct_count,total_stations,completed_at")
+        .eq("user_id", auth.user.id)
+        .order("completed_at", { ascending: false });
+      if (practicalError) { if (active) { setError(practicalError.message); setLoading(false); } return; }
       const assessmentIds = Array.from(new Set(rows.map((row) => row.assessment_id)));
       const { data: assessmentRows } = assessmentIds.length
         ? await supabase.from("assessments").select("id,title,course_id").in("id", assessmentIds)
@@ -65,6 +73,7 @@ export default function LearningProgressPage() {
       }
       if (!active) return;
       setAttempts(rows);
+      setPracticalAttempts((practicalRows ?? []) as PracticalAttempt[]);
       setAssessments(assessmentMap);
       setCourses(courseMap);
       setTopicStats(Array.from(topicMap.entries()).map(([topic, value]) => ({ topic, ...value })).sort((a, b) => a.correct / a.total - b.correct / b.total));
@@ -118,6 +127,16 @@ export default function LearningProgressPage() {
         {weakest.length ? weakest.map((topic) => <div className="topic-performance" key={topic.topic}><div><strong>{topic.topic}</strong><span>{topic.correct}/{topic.total} correct</span></div><div className="progress-track"><span style={{ width: Math.round(topic.correct / topic.total * 100) + "%" }}/></div></div>) : <div className="progress-empty compact-empty"><span>✳</span><p>Complete more questions with topic tags to unlock targeted study recommendations.</p></div>}
         <Link href="/library" className="progress-study-link">Continue studying →</Link>
       </aside>
+    </section>
+    <section className="progress-panel" style={{ marginTop: 24 }}>
+      <div className="section-heading compact"><div><div className="eyebrow">VIRTUAL LABORATORY</div><h2>Your practical sessions</h2></div><span className="progress-count">{practicalAttempts.length} completed</span></div>
+      {practicalAttempts.length === 0 ? <div className="progress-empty"><span>⚗</span><h3>No practical sessions yet</h3><p>Complete a virtual laboratory simulation to build your practical learning record.</p><Link href="/virtual-lab">Enter the Virtual Laboratory →</Link></div> :
+        <div className="progress-history">{practicalAttempts.map((attempt) => <article className="progress-history-row" key={attempt.id}>
+          <div className="progress-history-icon">⚗</div>
+          <div className="progress-history-main"><strong>Specimen Reception &amp; Acceptance</strong><small>{attempt.correct_count} of {attempt.total_stations} stations correct · {new Date(attempt.completed_at).toLocaleDateString()}</small></div>
+          <div className="progress-history-score"><strong>{attempt.score}%</strong><span className="passed">PRACTICE RESULT</span></div>
+        </article>)}</div>}
+      <Link href="/virtual-lab" className="progress-study-link">Practise another simulation →</Link>
     </section>
     <footer className="admin-footer">LabBridge Learn · Learn. Practise. Advance.</footer>
   </main>;
