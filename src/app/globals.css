@@ -729,3 +729,44 @@ html[data-low-data="true"] [class*="art-orbit"],html[data-low-data="true"] [clas
 .academic-review-empty p{font-size:10px;margin:0}
 .academic-review-denied{max-width:620px;margin:12vh auto}
 @media(max-width:650px){.academic-review-summary{grid-template-columns:1fr}.academic-review-summary>div{padding:14px}.academic-review-head{align-items:flex-start;flex-direction:column}.academic-review-actions>div{display:grid;grid-template-columns:1fr}.academic-review-actions button{width:100%}}
+
+
+/* Lecturer Workspace */
+.lecturer-page{min-height:100vh;background:#f6f9f6;padding:0 clamp(15px,5vw,70px) 30px;color:#203b32}
+.lecturer-page>.admin-header{max-width:1180px;margin:auto}
+.lecturer-hero{max-width:1180px;margin:42px auto 24px;display:flex;align-items:center;justify-content:space-between;gap:25px}
+.lecturer-hero h1{font:800 clamp(32px,4.4vw,48px)/1.12 Manrope;letter-spacing:-2px;margin:13px 0}
+.lecturer-hero h1 em{font-style:normal;color:#397b64}
+.lecturer-hero p{max-width:700px;color:#77877e;font-size:12px;line-height:1.8}
+.lecturer-hero small{font-size:10px;color:#849188}
+.lecturer-hero-mark{width:112px;height:112px;flex-shrink:0;border:1px solid #dbe8dd;border-radius:28px;display:grid;place-items:center;font:800 35px Manrope;color:#28694f;background:linear-gradient(145deg,#fff,#edf5ef);box-shadow:0 18px 45px #234c3e12}
+.lecturer-hero-mark span{color:#9dbb9f}
+.lecturer-stats{max-width:1180px;margin:0 auto 18px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.lecturer-stats article{background:#fff;border:1px solid #e3ece5;border-radius:12px;padding:16px;display:grid;gap:7px}
+.lecturer-stats span{font-size:8px;letter-spacing:1.2px;color:#829188;font-weight:800}
+.lecturer-stats strong{font:800 25px Manrope;color:#285c48}
+.lecturer-grid{max-width:1180px;margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.lecturer-wide{grid-column:1/-1}
+.lecturer-hint{font-size:10px;line-height:1.7;color:#819087;background:#f7faf7;border:1px solid #e7eee8;border-radius:8px;padding:11px}
+.lecturer-course-select{display:grid;gap:7px;max-width:500px;font-size:10px;font-weight:700;color:#53675c}
+.lecturer-course-select select{border:1px solid #dfe8e1;border-radius:8px;background:#fff;padding:11px;color:#31483b;font:12px 'DM Sans',sans-serif}
+.lecturer-outline{display:grid;gap:9px;margin-top:15px}
+.lecturer-outline>article,.lecturer-outline-child{border:1px solid #e6eee7;border-radius:9px;padding:13px;display:grid;gap:5px;background:#fff}
+.lecturer-outline span{font-size:8px;letter-spacing:1px;color:#64816e;font-weight:800}
+.lecturer-outline strong{font:700 12px Manrope;color:#2d493a}
+.lecturer-outline small{font-size:9px;color:#8a968e}
+.lecturer-outline-child{margin-left:18px;background:#fbfcfb}
+.lecturer-outline-child p{display:grid;gap:4px;border-top:1px solid #edf2ed;padding-top:9px;margin:4px 0 0 12px}
+.lecturer-submit{justify-self:start;margin-top:8px}
+.lecturer-review-history{border-top:1px solid #edf1ed;margin-top:22px;padding-top:16px;display:grid;gap:9px}
+.lecturer-review-history h3{font:700 13px Manrope;margin:0 0 4px}
+.lecturer-review-history article{border:1px solid #e7eee8;border-radius:8px;padding:11px;display:grid;gap:7px}
+.lecturer-review-history article>div{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lecturer-review-history article strong{font-size:9px;letter-spacing:1px;color:#577363}
+.lecturer-review-history article p{font-size:10px;line-height:1.6;color:#718078;margin:0}
+.lecturer-review-history article small{font-size:8px;color:#8d9991}
+.lecturer-denied{max-width:600px;margin:13vh auto;background:#fff;border:1px solid #e2ebe4;border-radius:16px;padding:30px}
+.lecturer-denied h1{font:800 28px Manrope;margin:12px 0}
+.lecturer-denied p{font-size:12px;line-height:1.7;color:#7a887f}
+.lecturer-denied a{font-size:11px;color:#28694f;font-weight:700}
+@media(max-width:700px){.lecturer-page{padding:0 14px 24px}.lecturer-hero{margin:28px auto 18px}.lecturer-hero-mark{width:68px;height:68px;border-radius:18px;font-size:25px}.lecturer-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.lecturer-stats article{padding:12px}.lecturer-grid{grid-template-columns:1fr;gap:10px}.lecturer-wide{grid-column:auto}.lecturer-outline-child{margin-left:8px}.lecturer-submit{width:100%}}
