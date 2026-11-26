@@ -146,8 +146,8 @@ export default function AdminPage() {
   }
 
   async function publishCourse() {
-    if (!selectedCourse || !reviewConfirmed) {
-      setMessage("Confirm academic review before publishing.");
+    if (!selectedCourse) {
+      setMessage("Choose a course before publishing.");
       return;
     }
     const courseModules = modules.filter((item) => item.course_id === selectedCourse);
