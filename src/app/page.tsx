@@ -158,7 +158,7 @@ export default function Home() {
           <div className="eyebrow"><span className="eyebrow-line" /> THE NEXT GENERATION OF MLS LEARNING</div>
           <h1>Learn with purpose.<br/><em>Grow with confidence.</em></h1>
           <p>A richer way to study Medical Laboratory Science — with trusted lessons, practical learning, visual explanations and a community built for your progress.</p>
-          <div className="auth-pill-row"><span>✳ Ghana-focused curriculum</span><span>◉ Visual learning</span><span>⌁ Learn at your pace</span></div>
+          <div className="auth-pill-row"><span>✳ Global curriculum pathways</span><span>◉ Visual learning</span><span>⌁ Learn at your pace</span></div>
           <div className="auth-illustration"><div className="auth-orbit"/><div className="auth-orbit second"/><div className="auth-cell">✳</div><span className="float-tag tag-one">LEARN</span><span className="float-tag tag-two">PRACTISE</span><span className="float-tag tag-three">ADVANCE</span></div>
         </div>
         <div className="auth-card">
@@ -195,7 +195,7 @@ export default function Home() {
           <a className="nav-item" href="#resources"><span className="nav-icon">▧</span> {t.studyResources}</a>
           <a className="nav-item" href="#practice"><span className="nav-icon">◎</span> {t.practiceQuizzes}</a>
         </nav>
-        <div className="sidebar-bottom"><div className="help-card"><div className="help-symbol">✦</div><strong>Keep your momentum</strong><p>Small study sessions add up. Make today count.</p><a href="#courses">Explore learning ↗</a></div><div className="sidebar-footer"><span className="status-dot"/> Your learning space <span>Ghana</span></div></div>
+        <div className="sidebar-bottom"><div className="help-card"><div className="help-symbol">✦</div><strong>Keep your momentum</strong><p>Small study sessions add up. Make today count.</p><a href="#courses">Explore learning ↗</a></div><div className="sidebar-footer"><span className="status-dot"/> Your learning space <span>{countries.find((item) => item.code === countryCode)?.name || "Global"}</span></div></div>
       </aside>
       <section className="main-area" id="overview">
         <header className="topbar"><div className="breadcrumb">LabBridge <span>/</span> <strong>Overview</strong></div><div className="top-actions"><label className="top-preference"><span>{t.language}</span><select value={language} onChange={(e) => void savePreferences(e.target.value as SupportedLocale, countryCode)}><option value="en">EN</option><option value="fr">FR</option><option value="pt">PT</option><option value="ar">AR</option><option value="sw">SW</option><option value="es">ES</option></select></label><label className="top-preference country-preference"><span>{t.country}</span><select value={countryCode} onChange={(e) => void savePreferences(language, e.target.value)}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><span className="plan-pill">{planCode.toUpperCase()}</span><span className="welcome-label">{user.email}</span><div className="avatar">{displayName.split(" ").map((part) => part[0]).slice(0,2).join("").toUpperCase()}</div><button className="signout-button" onClick={signOut}>{t.signOut}</button></div></header>
