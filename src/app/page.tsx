@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import { getMessages, type SupportedLocale } from "@/lib/i18n";
@@ -35,6 +35,7 @@ export default function Home() {
   const [language, setLanguage] = useState<SupportedLocale>("en");
   const [countryCode, setCountryCode] = useState("GH");
   const [countries, setCountries] = useState<Country[]>([]);
+  const preferenceChoice = useRef({ language: "en" as SupportedLocale, countryCode: "GH" });
   const t = getMessages(language);
 
   async function loadLearningSpace(currentUser: User) {
@@ -42,7 +43,9 @@ export default function Home() {
       supabase.from("profiles").select("full_name, student_number").eq("id", currentUser.id).maybeSingle(),
       supabase.from("courses").select("id, title, slug, description, discipline, level, cover_image_url").eq("status", "published").order("created_at", { ascending: false }),
       supabase.from("enrollments").select("course_id").eq("user_id", currentUser.id),
-      supabase.from("learning_progress").select("id, completion_percent").eq("user_id", currentUser.id)
+      supabase.from("learning_progress").select("id, completion_percent").eq("user_id", currentUser.id),
+      supabase.from("user_preferences").select("preferred_language,country_code").eq("user_id", currentUser.id).maybeSingle(),
+      supabase.from("countries").select("code,name,default_language_code").eq("is_enabled", true).order("name")
     ]);
 
     if (profileData) setProfile(profileData);
@@ -51,8 +54,16 @@ export default function Home() {
       const { data } = await supabase.from("profiles").upsert({ id: currentUser.id, full_name: name }, { onConflict: "id" }).select("full_name, student_number").maybeSingle();
       setProfile(data ?? { full_name: name, student_number: null });
     }
-    if (preferenceData?.preferred_language) setLanguage(preferenceData.preferred_language as SupportedLocale);
-    if (preferenceData?.country_code) setCountryCode(preferenceData.country_code);
+    if (preferenceData?.preferred_language) {
+      const savedLanguage = preferenceData.preferred_language as SupportedLocale;
+      const savedCountry = preferenceData.country_code || "GH";
+      preferenceChoice.current = { language: savedLanguage, countryCode: savedCountry };
+      setLanguage(savedLanguage); setCountryCode(savedCountry);
+    } else {
+      const choice = preferenceChoice.current;
+      setLanguage(choice.language); setCountryCode(choice.countryCode);
+      await supabase.from("user_preferences").upsert({ user_id: currentUser.id, preferred_language: choice.language, country_code: choice.countryCode }, { onConflict: "user_id" });
+    }
     setCountries((countryData ?? []) as Country[]);
     setCourses(courseData ?? []);
     setEnrolled((enrollmentData ?? []).map((item) => item.course_id));
@@ -61,7 +72,6 @@ export default function Home() {
 
   useEffect(() => {
     let active = true;
-    supabase.from("countries").select("code,name,default_language_code").eq("is_enabled", true).order("name").then(({ data }) => { if (active && data) setCountries(data as Country[]); });
     supabase.auth.getSession().then(async ({ data }) => {
       if (!active) return;
       setUser(data.session?.user ?? null);
@@ -102,7 +112,20 @@ export default function Home() {
     } finally { setBusy(false); }
   }
 
-  async function savePreferences(nextLanguage: SupportedLocale, nextCountry: string) {\n    setLanguage(nextLanguage); setCountryCode(nextCountry);\n    if (!user) return;\n    const { error } = await supabase.from("user_preferences").upsert({ user_id: user.id, preferred_language: nextLanguage, country_code: nextCountry }, { onConflict: "user_id" });\n    if (error) setMessage("Your preference could not be saved: " + error.message);\n  }\n\n  async function enroll(courseId: string) {
+  async function savePreferences(nextLanguage: SupportedLocale, nextCountry: string) {
+    preferenceChoice.current = { language: nextLanguage, countryCode: nextCountry };
+    setLanguage(nextLanguage);
+    setCountryCode(nextCountry);
+    if (!user) return;
+    const { error } = await supabase.from("user_preferences").upsert({
+      user_id: user.id,
+      preferred_language: nextLanguage,
+      country_code: nextCountry
+    }, { onConflict: "user_id" });
+    if (error) setMessage("Your preference could not be saved: " + error.message);
+  }
+
+  async function enroll(courseId: string) {
     if (!user) return;
     setBusy(true); setMessage("");
     const { error } = await supabase.from("enrollments").insert({ user_id: user.id, course_id: courseId });
@@ -120,7 +143,7 @@ export default function Home() {
 
   if (!user) return (
     <main className="auth-page" dir={language === "ar" ? "rtl" : "ltr"}>
-      <div className="auth-brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>LEARN</small></span><div className="auth-preferences"><label>{t.language}<select value={language} onChange={(e) => setLanguage(e.target.value as SupportedLocale)}><option value="en">English</option><option value="fr">Français</option><option value="pt">Português</option><option value="ar">العربية</option><option value="sw">Kiswahili</option><option value="es">Español</option></select></label><label>{t.country}<select value={countryCode} onChange={(e) => setCountryCode(e.target.value)}>{countries.length ? countries.map((item) => <option key={item.code} value={item.code}>{item.name}</option>) : <option value="GH">Ghana</option>}</select></label></div></div>
+      <div className="auth-brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>LEARN</small></span><div className="auth-preferences"><label>{t.language}<select value={language} onChange={(e) => { const value = e.target.value as SupportedLocale; preferenceChoice.current.language = value; setLanguage(value); }}><option value="en">English</option><option value="fr">Français</option><option value="pt">Português</option><option value="ar">العربية</option><option value="sw">Kiswahili</option><option value="es">Español</option></select></label><label>{t.country}<select value={countryCode} onChange={(e) => { preferenceChoice.current.countryCode = e.target.value; setCountryCode(e.target.value); }}>{countries.length ? countries.map((item) => <option key={item.code} value={item.code}>{item.name}</option>) : <option value="GH">Ghana</option>}</select></label></div></div>
       <section className="auth-layout">
         <div className="auth-story">
           <div className="eyebrow"><span className="eyebrow-line" /> THE NEXT GENERATION OF MLS LEARNING</div>
