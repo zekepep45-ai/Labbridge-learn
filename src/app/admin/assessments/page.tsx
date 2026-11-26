@@ -29,6 +29,7 @@ export default function AssessmentStudioPage() {
   const [difficulty, setDifficulty] = useState("beginner");
   const [reference, setReference] = useState("");
   const [reviewConfirmed, setReviewConfirmed] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -94,23 +95,61 @@ export default function AssessmentStudioPage() {
       return;
     }
     setBusy(true); setMessage("");
-    const { data, error } = await supabase.from("assessment_questions").insert({
-      course_id: assessment.course_id, stem: stem.trim(), options: usableOptions,
-      answer_key: answer, explanation: explanation.trim(), difficulty,
-      reference_text: reference.trim(), status: "draft"
-    }).select("id").single();
-    if (error) setMessage("Question not saved: " + error.message);
-    else if (data) {
-      const { error: linkError } = await supabase.from("assessment_question_links").insert({
-        assessment_id: assessment.id, question_id: data.id, position: questions.length + 1, points: 1
-      });
-      if (linkError) setMessage("Question created but could not be attached: " + linkError.message);
+    if (editingQuestion) {
+      const { error } = await supabase.from("assessment_questions").update({
+        stem: stem.trim(), options: usableOptions, answer_key: answer,
+        explanation: explanation.trim(), difficulty, reference_text: reference.trim()
+      }).eq("id", editingQuestion).eq("status", "draft");
+      if (error) setMessage("Question update failed: " + error.message);
       else {
-        setStem(""); setOptions(["", "", "", ""]); setAnswer("A"); setExplanation(""); setReference("");
+        setEditingQuestion(null); setStem(""); setOptions(["", "", "", ""]); setAnswer("A"); setExplanation(""); setReference("");
         await loadQuestions(assessment.id);
-        setMessage("Draft question added to the assessment.");
+        setMessage("Draft question updated.");
+      }
+    } else {
+      const { data, error } = await supabase.from("assessment_questions").insert({
+        course_id: assessment.course_id, stem: stem.trim(), options: usableOptions,
+        answer_key: answer, explanation: explanation.trim(), difficulty,
+        reference_text: reference.trim(), status: "draft"
+      }).select("id").single();
+      if (error) setMessage("Question not saved: " + error.message);
+      else if (data) {
+        const { error: linkError } = await supabase.from("assessment_question_links").insert({
+          assessment_id: assessment.id, question_id: data.id, position: questions.length + 1, points: 1
+        });
+        if (linkError) setMessage("Question created but could not be attached: " + linkError.message);
+        else {
+          setStem(""); setOptions(["", "", "", ""]); setAnswer("A"); setExplanation(""); setReference("");
+          await loadQuestions(assessment.id);
+          setMessage("Draft question added to the assessment.");
+        }
       }
     }
+    setBusy(false);
+  }
+
+  function beginEditQuestion(question: Question) {
+    if (question.status !== "draft") { setMessage("Published questions are locked. Unpublish the assessment before making changes."); return; }
+    setEditingQuestion(question.id);
+    setStem(question.stem);
+    setOptions(["A","B","C","D"].map((key) => question.options.find((option) => option.key === key)?.text ?? ""));
+    setAnswer(question.answer_key);
+    setExplanation(question.explanation);
+    setReference(question.reference_text ?? "");
+    setDifficulty(question.difficulty);
+    setMessage("Editing draft question. Save your changes in the question form.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function deleteQuestion(question: Question) {
+    if (question.status !== "draft") { setMessage("Only draft questions can be deleted. Published questions are retained for assessment history."); return; }
+    if (!window.confirm("Delete this draft question? This cannot be undone.")) return;
+    setBusy(true); setMessage("");
+    const unlink = await supabase.from("assessment_question_links").delete().eq("question_id", question.id).eq("assessment_id", selectedAssessment);
+    if (unlink.error) { setMessage("Could not remove question from assessment: " + unlink.error.message); setBusy(false); return; }
+    const removed = await supabase.from("assessment_questions").delete().eq("id", question.id).eq("status", "draft");
+    if (removed.error) setMessage("Could not delete question: " + removed.error.message);
+    else { if (editingQuestion === question.id) { setEditingQuestion(null); setStem(""); setOptions(["","","",""]); setExplanation(""); setReference(""); setAnswer("A"); } await loadQuestions(selectedAssessment); setMessage("Draft question deleted."); }
     setBusy(false);
   }
 
@@ -155,10 +194,10 @@ export default function AssessmentStudioPage() {
         <div className="admin-form-row"><label>Correct answer<select value={answer} onChange={(e) => setAnswer(e.target.value)}>{["A","B","C","D"].map((key) => <option key={key} value={key}>{key}</option>)}</select></label><label>Difficulty<select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></label></div>
         <label>Explanation<textarea required rows={3} value={explanation} onChange={(e) => setExplanation(e.target.value)} placeholder="Explain why the best answer is correct."/></label>
         <label>Reference<input required value={reference} onChange={(e) => setReference(e.target.value)} placeholder="Guideline, textbook, standard or DOI"/></label>
-        <button className="primary-button" disabled={busy || !selectedAssessment}>Add draft question →</button>
+        <div className="assessment-form-actions"><button className="primary-button" disabled={busy || !selectedAssessment}>{editingQuestion ? "Save question changes →" : "Add draft question →"}</button>{editingQuestion && <button type="button" className="secondary-button" disabled={busy} onClick={() => { setEditingQuestion(null); setStem(""); setOptions(["","","",""]); setAnswer("A"); setExplanation(""); setReference(""); }}>Cancel edit</button>}</div>
       </form></section>
       <section className="admin-card admin-card-wide"><div className="admin-card-head"><span>03 / REVIEW & PUBLISH</span><h2>Assessment readiness</h2></div>
-        <div className="content-outline"><div><span>ASSESSMENT</span><strong>{activeAssessment?.title || "Choose an assessment"}</strong><small>{activeAssessment?.status.toUpperCase() || "NOT SELECTED"}</small></div><div className="outline-child"><span>QUESTION BANK</span><strong>{questions.length} of {activeAssessment?.question_count ?? 0} questions added</strong>{questions.map((item,index) => <div className="assessment-review-item" key={item.id}><p>{String(index+1).padStart(2,"0")} · {item.stem} <small>{item.status.toUpperCase()} · {item.difficulty}</small></p><ul>{item.options.map((option) => <li key={option.key} className={option.key === item.answer_key ? "assessment-answer-key" : ""}>{option.key}. {option.text}{option.key === item.answer_key ? " · BEST ANSWER" : ""}</li>)}</ul><p className="assessment-explanation"><strong>Explanation:</strong> {item.explanation}</p>{item.reference_text && <p className="assessment-reference">Reference: {item.reference_text}</p>}</div>)}</div></div>
+        <div className="content-outline"><div><span>ASSESSMENT</span><strong>{activeAssessment?.title || "Choose an assessment"}</strong><small>{activeAssessment?.status.toUpperCase() || "NOT SELECTED"}</small></div><div className="outline-child"><span>QUESTION BANK</span><strong>{questions.length} of {activeAssessment?.question_count ?? 0} questions added</strong>{questions.map((item,index) => <div className="assessment-review-item" key={item.id}><p>{String(index+1).padStart(2,"0")} · {item.stem} <small>{item.status.toUpperCase()} · {item.difficulty}</small></p><ul>{item.options.map((option) => <li key={option.key} className={option.key === item.answer_key ? "assessment-answer-key" : ""}>{option.key}. {option.text}{option.key === item.answer_key ? " · BEST ANSWER" : ""}</li>)}</ul><p className="assessment-explanation"><strong>Explanation:</strong> {item.explanation}</p>{item.reference_text && <p className="assessment-reference">Reference: {item.reference_text}</p>}<div className="assessment-item-actions"><button type="button" className="secondary-button" disabled={busy || item.status !== "draft"} onClick={() => beginEditQuestion(item)}>Edit draft</button><button type="button" className="danger-button" disabled={busy || item.status !== "draft"} onClick={() => void deleteQuestion(item)}>Delete draft</button></div></div>)}</div></div>
         <div className="publish-check" style={{marginTop:16}}><p>Publishing makes this quiz available to learners once its parent course is published. Verify the question, answer, explanation and reference for every item.</p><label className="review-check"><input type="checkbox" checked={reviewConfirmed} onChange={(e) => setReviewConfirmed(e.target.checked)}/> I confirm that every question has completed academic review.</label><button className="primary-button" disabled={busy || !activeAssessment || activeAssessment.status === "published" || !reviewConfirmed} onClick={publishAssessment}>Publish assessment ↗</button></div>
       </section>
     </div>
