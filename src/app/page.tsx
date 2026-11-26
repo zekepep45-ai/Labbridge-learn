@@ -198,6 +198,8 @@ export default function Home() {
           <a className="nav-item" href="/community"><span className="nav-icon">◎</span> Student Community</a>
           <a className="nav-item" href="/ai-tutor"><span className="nav-icon">✦</span> LabBridge AI Tutor</a>
           <a className="nav-item" href="/study-tools"><span className="nav-icon">✧</span> Personal Study Tools</a>
+          <a className="nav-item" href="/revision"><span className="nav-icon">⌕</span> Smart Revision & Question Bank</a>
+          <a className="nav-item" href="/certificates"><span className="nav-icon">✧</span> Certificates</a>
           <a className="nav-item" href="#courses"><span className="nav-icon">▤</span> {t.myCourses}</a>
           <a className="nav-item" href="#resources"><span className="nav-icon">▧</span> {t.studyResources}</a>
           <a className="nav-item" href="/progress"><span className="nav-icon">◎</span> {t.practiceQuizzes}</a>
