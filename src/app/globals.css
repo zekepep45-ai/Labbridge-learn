@@ -571,3 +571,49 @@ h3{font:700 14px Manrope;margin-bottom:7px;letter-spacing:-.3px}
 .achievement-card>b{margin-left:auto;font-size:7px;letter-spacing:.5px;color:#7b9182}
 .achievement-card.locked{opacity:.55;background:#fafbfa}.achievement-card.earned{border-color:#cfe2d3;background:#f8fcf8}
 @media(max-width:760px){.achievement-grid{grid-template-columns:1fr}.study-filters,.community-filters{flex-direction:column}.study-filters input,.study-filters select,.community-filters input,.community-filters select{width:100%}}
+
+/* LabBridge AI Tutor */
+.tutor-page{min-height:100vh;background:#f4f7f4;color:#173b2b;padding:0 20px 42px}
+.tutor-topbar{height:72px;max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2eae3}
+.tutor-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#173b2b}.tutor-brand>span:last-child{display:grid;gap:1px}.tutor-brand strong{font:800 15px Manrope,sans-serif;letter-spacing:-.4px}.tutor-brand small{font:700 8px 'DM Sans',sans-serif;letter-spacing:2px;color:#789082}
+.tutor-brand-mark{width:36px;height:36px;border-radius:11px;background:#164b35;color:#fff;display:grid;place-items:center;font:800 18px Manrope}.tutor-brand-mark span{color:#b8e3c2}
+.tutor-back-link{font:700 11px 'DM Sans',sans-serif;color:#557261;text-decoration:none}
+.tutor-workspace{max-width:920px;margin:36px auto 0}
+.tutor-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:23px}
+.tutor-eyebrow{font:800 9px 'DM Sans',sans-serif;letter-spacing:1.6px;color:#7a9a83}
+.tutor-heading h1{font:800 clamp(27px,4vw,38px) Manrope,sans-serif;letter-spacing:-1.5px;margin:8px 0;color:#173b2b}
+.tutor-heading h1 span{color:#43845d}
+.tutor-heading p{font:12px 'DM Sans',sans-serif;color:#728478;margin:0;line-height:1.7}
+.tutor-allowance{min-width:112px;text-align:right;display:grid;gap:4px;padding:11px 14px;border:1px solid #dce9de;border-radius:11px;background:#fff}
+.tutor-allowance span{font:800 8px 'DM Sans',sans-serif;letter-spacing:1px;color:#839487}.tutor-allowance strong{font:800 17px Manrope;color:#245a3a}.tutor-allowance small{font-size:9px;color:#829087}
+.tutor-mode-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tutor-mode-tabs button{border:1px solid #dce8de;border-radius:9px;background:#fff;padding:10px 14px;color:#667b6d;font:700 10px 'DM Sans',sans-serif;cursor:pointer}
+.tutor-mode-tabs button span{margin-right:5px}.tutor-mode-tabs button.active{background:#194d36;color:#fff;border-color:#194d36}.tutor-mode-tabs button:disabled{opacity:.55}
+.tutor-chat-card{background:#fff;border:1px solid #e0e9e1;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(23,59,43,.05)}
+.tutor-chat-header{height:66px;padding:0 20px;display:flex;align-items:center;gap:11px;border-bottom:1px solid #edf1ed}
+.tutor-avatar{width:34px;height:34px;border-radius:10px;background:#eaf4ec;color:#285e3c;display:grid;place-items:center;font:800 12px Manrope}
+.tutor-chat-header>div:nth-child(2){display:grid;gap:3px}.tutor-chat-header strong{font:800 11px Manrope;color:#244a34}.tutor-chat-header small{font:9px 'DM Sans',sans-serif;color:#8b988e}
+.tutor-chat-header>button{margin-left:auto;border:0;background:transparent;color:#6d8a75;font:700 9px 'DM Sans',sans-serif;cursor:pointer}
+.tutor-conversation{height:min(58vh,590px);min-height:390px;overflow:auto;padding:22px 24px;background:#fbfcfb}
+.tutor-welcome{max-width:560px;margin:32px auto;text-align:center}
+.tutor-welcome-icon{width:52px;height:52px;border-radius:16px;background:#e9f4eb;color:#32704a;display:grid;place-items:center;margin:0 auto 15px;font-size:24px}
+.tutor-welcome h2{font:800 20px Manrope;color:#214b33;margin:0 0 8px}.tutor-welcome>p{font:11px 'DM Sans',sans-serif;color:#7b8a7f;line-height:1.7;margin:0 auto 20px;max-width:440px}
+.tutor-suggestions{display:grid;gap:8px;text-align:left}.tutor-suggestions button{border:1px solid #e0e9e1;border-radius:9px;background:#fff;padding:12px 14px;color:#466451;font:600 10px 'DM Sans',sans-serif;text-align:left;cursor:pointer}.tutor-suggestions button span{float:right;color:#8aa492}
+.tutor-message{max-width:88%;margin:0 0 20px;padding:13px 15px;border-radius:12px}
+.tutor-message.user{margin-left:auto;background:#eaf3ec;border:1px solid #dceade}.tutor-message.assistant{margin-right:auto;background:#fff;border:1px solid #e8eee8}
+.tutor-message-label{font:800 8px 'DM Sans',sans-serif;letter-spacing:1px;color:#809186;margin-bottom:8px}
+.tutor-message-content{font:12px/1.75 'DM Sans',sans-serif;color:#354e3d;overflow-wrap:anywhere}
+.tutor-message-content .markdown-content h2,.tutor-message-content .markdown-content h3,.tutor-message-content .markdown-content h4{font-family:Manrope,sans-serif;color:#244d34;margin:13px 0 6px}
+.tutor-message-content .markdown-content p{margin:0 0 9px}.tutor-message-content .markdown-content ul,.tutor-message-content .markdown-content ol{padding-left:20px;margin:6px 0 12px}.tutor-message-content .markdown-content li{margin:4px 0}
+.tutor-message-content .markdown-content pre{white-space:pre-wrap;background:#f3f6f3;border-radius:7px;padding:10px}
+.tutor-typing{font:italic 11px 'DM Sans',sans-serif;color:#8a998e}
+.tutor-error{margin:0 20px 12px;padding:10px 12px;background:#fff5f1;border:1px solid #f0d7cc;border-radius:8px;color:#995b43;font:10px 'DM Sans',sans-serif}
+.tutor-composer{margin:0 20px;border:1px solid #dfe8df;border-radius:12px;padding:12px;background:#fff}
+.tutor-composer textarea{display:block;width:100%;resize:vertical;min-height:48px;border:0;outline:none;background:transparent;color:#294b35;font:12px/1.6 'DM Sans',sans-serif}
+.tutor-composer-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}.tutor-composer-footer>span{font:9px 'DM Sans',sans-serif;color:#99a49b}
+.tutor-composer-footer button,.tutor-primary-link{border:0;border-radius:8px;background:#194d36;color:#fff;padding:10px 14px;font:800 10px 'DM Sans',sans-serif;cursor:pointer;text-decoration:none}
+.tutor-composer-footer button:disabled{opacity:.5;cursor:not-allowed}.tutor-composer-footer button span{margin-left:8px}
+.tutor-safety-note{text-align:center;color:#98a39a;font:9px/1.6 'DM Sans',sans-serif;margin:13px 20px 17px}
+.tutor-auth-card{max-width:400px;margin:15vh auto 0;padding:34px;background:#fff;border:1px solid #e0e9e1;border-radius:16px;text-align:center;display:grid;justify-items:center;gap:13px}
+.tutor-auth-card h1{font:800 20px Manrope;margin:0;color:#214b33}.tutor-auth-card p{font:11px/1.7 'DM Sans',sans-serif;color:#78887c;margin:0 0 6px}.tutor-loading{min-height:100vh;display:grid;place-items:center;background:#f4f7f4;color:#4d765b;font:600 13px 'DM Sans',sans-serif}
+@media(max-width:640px){.tutor-page{padding:0 12px 24px}.tutor-workspace{margin-top:24px}.tutor-heading{align-items:flex-start}.tutor-heading p{max-width:300px}.tutor-allowance{min-width:92px;padding:9px}.tutor-allowance strong{font-size:14px}.tutor-mode-tabs{display:grid;grid-template-columns:1fr 1fr}.tutor-mode-tabs button:last-child{grid-column:1/-1}.tutor-conversation{height:58vh;min-height:350px;padding:16px 12px}.tutor-message{max-width:96%}.tutor-chat-header{padding:0 13px}.tutor-composer{margin:0 12px}.tutor-safety-note{margin:12px 10px}.tutor-heading h1{font-size:26px}}
