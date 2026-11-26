@@ -84,6 +84,8 @@ export default function VirtualLabPage() {
   const [revealed, setRevealed] = useState(false);
   const [answers, setAnswers] = useState<number[]>([]);
   const [finished, setFinished] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -104,8 +106,14 @@ export default function VirtualLabPage() {
     setRevealed(true);
   }
 
-  function nextStation() {
+  async function nextStation() {
     if (stationIndex === stations.length - 1) {
+      setSaving(true);
+      setSaveMessage("");
+      const { error } = await supabase.rpc("submit_virtual_lab_attempt", { p_responses: answers });
+      setSaving(false);
+      if (error) setSaveMessage("This session could not be saved right now. Your result is still visible here; please try again later.");
+      else setSaveMessage("Your practical result has been saved to your learning progress.");
       setFinished(true);
       return;
     }
@@ -120,6 +128,7 @@ export default function VirtualLabPage() {
     setRevealed(false);
     setAnswers([]);
     setFinished(false);
+    setSaveMessage("");
   }
 
   if (checking) return <main className="loading-screen"><div className="loading-mark">L<span>+</span></div><p>Preparing your virtual laboratory…</p></main>;
@@ -158,13 +167,15 @@ export default function VirtualLabPage() {
               <span className="vl-section-kicker">YOUR DECISION</span>
               <h2>{station.question}</h2>
               <div className="vl-options">{station.options.map((option, index) => <button type="button" key={option} disabled={revealed} onClick={() => setChoice(index)} className={"vl-option " + (choice === index ? "selected" : "") + (revealed && index === station.answer ? " correct" : "") + (revealed && choice === index && choice !== station.answer ? " incorrect" : "")}><span className="vl-option-letter">{String.fromCharCode(65 + index)}</span><span>{option}</span>{revealed && index === station.answer && <b>Correct action</b>}</button>)}</div>
-              {!revealed ? <button className="primary-button vl-submit" disabled={choice === null} onClick={checkDecision}>Confirm decision →</button> : <div className={"vl-feedback " + (choice === station.answer ? "good" : "review")}><strong>{choice === station.answer ? "Well done — safe decision." : "Let's review that decision."}</strong><p>{station.explanation}</p><small><b>KEY PRINCIPLE</b> · {station.principle}</small><button className="primary-button vl-submit" onClick={nextStation}>{stationIndex === stations.length - 1 ? "View session results →" : "Continue to next station →"}</button></div>}
+              {!revealed ? <button className="primary-button vl-submit" disabled={choice === null} onClick={checkDecision}>Confirm decision →</button> : <div className={"vl-feedback " + (choice === station.answer ? "good" : "review")}><strong>{choice === station.answer ? "Well done — safe decision." : "Let's review that decision."}</strong><p>{station.explanation}</p><small><b>KEY PRINCIPLE</b> · {station.principle}</small><button className="primary-button vl-submit" onClick={nextStation} disabled={saving}>{saving ? "Saving your result…" : stationIndex === stations.length - 1 ? "View session results →" : "Continue to next station →"}</button></div>}
             </div>
           </> : <div className="vl-results">
             <div className="eyebrow"><span className="eyebrow-line"/> SESSION COMPLETE</div>
             <div className="vl-score-ring"><strong>{percentage}%</strong><span>{score} / {stations.length} correct</span></div>
             <h2>{percentage >= 80 ? "Excellent laboratory judgement." : percentage >= 60 ? "Good progress. Keep practising." : "A useful first practice session."}</h2>
             <p>You completed all five specimen reception stations. Review the principles below and repeat the simulation to strengthen your decisions.</p>
+            {saveMessage && <div className="vl-feedback good"><strong>{saveMessage}</strong></div>}
+            <Link className="vl-back-link" href="/progress">View your learning progress →</Link>
             <div className="vl-result-list">{stations.map((item, index) => <div key={item.title}><span className={answers[index] === item.answer ? "pass" : "retry"}>{answers[index] === item.answer ? "✓" : "↻"}</span><div><strong>{item.title}</strong><small>{answers[index] === item.answer ? "Correct decision" : "Review: " + item.principle}</small></div></div>)}</div>
             <button className="primary-button vl-submit" onClick={restart}>Practise again ↻</button>
             <Link className="vl-back-link" href="/library">Explore the academic library →</Link>
