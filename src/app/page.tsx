@@ -5,6 +5,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import { getMessages, type SupportedLocale } from "@/lib/i18n";
 import LandingPage from "@/components/LandingPage";
+import StudentDashboard from "@/components/StudentDashboard";
 
 type Course = {
   id: string;
@@ -27,7 +28,11 @@ export default function Home() {
   const [enrolled, setEnrolled] = useState<string[]>([]);
   const [completedLessons, setCompletedLessons] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [authMode, setAuthMode] = useState<"signin" | "signup" | "reset">("signin");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [courseProgress, setCourseProgress] = useState<Record<string, { percent: number; completed: number; total: number; nextLesson: string | null }>>({});
+  const [overallProgress, setOverallProgress] = useState(0);
+  const [recentActivity, setRecentActivity] = useState<{ title: string; courseTitle: string; lastAccessedAt: string; percent: number }[]>([]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,15 +48,17 @@ export default function Home() {
   const t = getMessages(language);
 
   async function loadLearningSpace(currentUser: User) {
-    const [{ data: profileData }, { data: courseData }, { data: enrollmentData }, { data: progressData }, { data: preferenceData }, { data: countryData }, { data: subscriptionData }, { data: roleRows }] = await Promise.all([
+    const [{ data: profileData }, { data: courseData }, { data: enrollmentData }, { data: progressData }, { data: preferenceData }, { data: countryData }, { data: subscriptionData }, { data: roleRows }, { data: moduleData }, { data: lessonData }] = await Promise.all([
       supabase.from("profiles").select("full_name, student_number").eq("id", currentUser.id).maybeSingle(),
       supabase.from("courses").select("id, title, slug, description, discipline, level, cover_image_url").eq("status", "published").order("created_at", { ascending: false }),
       supabase.from("enrollments").select("course_id").eq("user_id", currentUser.id),
-      supabase.from("learning_progress").select("id, completion_percent").eq("user_id", currentUser.id),
+      supabase.from("learning_progress").select("id, lesson_id, completion_percent, last_accessed_at").eq("user_id", currentUser.id),
       supabase.from("user_preferences").select("preferred_language,country_code").eq("user_id", currentUser.id).maybeSingle(),
       supabase.from("countries").select("code,name,default_language_code").eq("is_enabled", true).order("name"),
       supabase.from("user_subscriptions").select("plan_code").eq("user_id", currentUser.id).in("status", ["active", "trialing"]).maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", currentUser.id)
+      supabase.from("user_roles").select("role").eq("user_id", currentUser.id),
+      supabase.from("course_modules").select("id,course_id"),
+      supabase.from("lessons").select("id,title,slug,module_id,estimated_minutes").eq("status", "published").order("position")
     ]);
 
     setCanReviewAcademicContent((roleRows ?? []).some((item) => ["admin", "academic_reviewer"].includes(item.role)));
@@ -82,6 +89,32 @@ export default function Home() {
     setCourses(courseData ?? []);
     setEnrolled((enrollmentData ?? []).map((item) => item.course_id));
     setCompletedLessons((progressData ?? []).filter((item) => item.completion_percent >= 100).length);
+    const moduleCourse = new Map((moduleData ?? []).map((item) => [item.id, item.course_id]));
+    const lessonCourse = new Map((lessonData ?? []).map((item) => [item.id, moduleCourse.get(item.module_id)]));
+    const lessonById = new Map((lessonData ?? []).map((item) => [item.id, item]));
+    const progressByLesson = new Map((progressData ?? []).map((item) => [item.lesson_id, item]));
+    const nextCourseProgress: Record<string, { percent: number; completed: number; total: number; nextLesson: string | null }> = {};
+    let totalLessonCount = 0;
+    let totalPercent = 0;
+    for (const course of (courseData ?? [])) {
+      const courseLessons = (lessonData ?? []).filter((lesson) => moduleCourse.get(lesson.module_id) === course.id);
+      const courseRows = courseLessons.map((lesson) => progressByLesson.get(lesson.id));
+      const completed = courseRows.filter((item) => (item?.completion_percent ?? 0) >= 100).length;
+      const percent = courseLessons.length ? Math.round(courseRows.reduce((sum, item) => sum + (item?.completion_percent ?? 0), 0) / courseLessons.length) : 0;
+      const nextLesson = courseLessons.find((lesson) => (progressByLesson.get(lesson.id)?.completion_percent ?? 0) < 100)?.title ?? null;
+      nextCourseProgress[course.id] = { percent, completed, total: courseLessons.length, nextLesson };
+      totalLessonCount += courseLessons.length;
+      totalPercent += courseLessons.reduce((sum, lesson) => sum + (progressByLesson.get(lesson.id)?.completion_percent ?? 0), 0);
+    }
+    setCourseProgress(nextCourseProgress);
+    setOverallProgress(totalLessonCount ? Math.round(totalPercent / totalLessonCount) : 0);
+    const courseTitleById = new Map((courseData ?? []).map((course) => [course.id, course.title]));
+    const activity = (progressData ?? []).filter((item) => item.last_accessed_at && lessonById.has(item.lesson_id)).sort((a, b) => new Date(b.last_accessed_at).getTime() - new Date(a.last_accessed_at).getTime()).slice(0, 4).map((item) => {
+      const lesson = lessonById.get(item.lesson_id)!;
+      const courseId = lessonCourse.get(item.lesson_id);
+      return { title: lesson.title, courseTitle: courseTitleById.get(courseId) || "MLS learning", lastAccessedAt: item.last_accessed_at, percent: item.completion_percent };
+    });
+    setRecentActivity(activity);
   }
 
   useEffect(() => {
@@ -99,7 +132,7 @@ export default function Home() {
       if (nextUser) {
         setTimeout(() => { if (active) void loadLearningSpace(nextUser); }, 0);
       } else {
-        setProfile(null); setCourses([]); setEnrolled([]); setCompletedLessons(0);
+        setProfile(null); setCourses([]); setEnrolled([]); setCompletedLessons(0); setCourseProgress({}); setOverallProgress(0); setRecentActivity([]);
       }
       setLoading(false);
     });
@@ -107,18 +140,28 @@ export default function Home() {
   }, [supabase]);
 
   async function handleAuth(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setMessage("");
+    event.preventDefault();
+    setBusy(true);
+    setMessage("");
+    const normalizedEmail = email.trim().toLowerCase();
     try {
-      if (authMode === "signup") {
+      if (authMode === "reset") {
+        const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+          redirectTo: window.location.origin + "/reset-password"
+        });
+        if (error) throw error;
+        setMessage("If an account exists for this email, a password reset link has been sent. Check your inbox.");
+      } else if (authMode === "signup") {
         const { data, error } = await supabase.auth.signUp({
-          email, password,
-          options: { data: { full_name: fullName.trim() } }
+          email: normalizedEmail,
+          password,
+          options: { emailRedirectTo: window.location.origin, data: { full_name: fullName.trim() } }
         });
         if (error) throw error;
         if (data.session) setMessage(t.welcomeMessage);
-        else setMessage(t.accountCreated);
+        else setMessage("Your account has been created. Check your email to confirm your address before signing in.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
         if (error) throw error;
         setMessage(t.welcomeBackMessage);
       }
@@ -167,17 +210,18 @@ export default function Home() {
       }
     >
       <section className="auth-card lb-auth-card">
-        <div className="eyebrow">{authMode === "signin" ? "YOUR LEARNING SPACE" : "START YOUR JOURNEY"}</div>
-        <h2>{authMode === "signin" ? t.welcomeBack : t.createAccount}</h2>
-        <p className="auth-subtitle">{authMode === "signin" ? t.continueLearning : t.joinCommunity}</p>
+        <div className="eyebrow">{authMode === "signin" ? "YOUR LEARNING SPACE" : authMode === "signup" ? "START YOUR JOURNEY" : "ACCOUNT RECOVERY"}</div>
+        <h2>{authMode === "signin" ? t.welcomeBack : authMode === "signup" ? t.createAccount : "Reset your password"}</h2>
+        <p className="auth-subtitle">{authMode === "signin" ? t.continueLearning : authMode === "signup" ? t.joinCommunity : "Enter the email address linked to your account and we’ll send you a secure reset link."}</p>
         <form onSubmit={handleAuth} className="auth-form">
           {authMode === "signup" && <label>{t.fullName}<input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" required autoComplete="name" /></label>}
           <label>{t.email}<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required autoComplete="email" /></label>
-          <label>{t.password}<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" minLength={8} required autoComplete={authMode === "signin" ? "current-password" : "new-password"} /></label>
-          <button className="primary-button" disabled={busy}>{busy ? "Please wait…" : authMode === "signin" ? t.signInToLabBridge + " →" : t.createAccount + " →"}</button>
+          {authMode !== "reset" && <label>{t.password}<span className="lb-password-field"><input type={passwordVisible ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" minLength={8} required autoComplete={authMode === "signin" ? "current-password" : "new-password"} /><button type="button" className="lb-password-toggle" onClick={() => setPasswordVisible((value) => !value)} aria-label={passwordVisible ? "Hide password" : "Show password"}>{passwordVisible ? "Hide" : "Show"}</button></span></label>}
+          <button className="primary-button" disabled={busy}>{busy ? "Please wait…" : authMode === "signin" ? t.signInToLabBridge + " →" : authMode === "signup" ? t.createAccount + " →" : "Send reset link →"}</button>
         </form>
         {message && <p className="auth-message" role="status">{message}</p>}
-        <p className="auth-switch">{authMode === "signin" ? "New to LabBridge?" : "Already have an account?"} <button onClick={() => { setAuthMode(authMode === "signin" ? "signup" : "signin"); setMessage(""); }}>{authMode === "signin" ? "Create an account" : "Sign in"}</button></p>
+        {authMode === "signin" && <button type="button" className="lb-forgot-link" onClick={() => { setAuthMode("reset"); setMessage(""); }}>Forgot your password?</button>}
+        <p className="auth-switch">{authMode === "signin" ? "New to LabBridge?" : authMode === "signup" ? "Already have an account?" : "Remembered your password?"} <button type="button" onClick={() => { setAuthMode("signin"); setMessage(""); }}>{authMode === "signin" ? "Create an account" : "Back to sign in"}</button>{authMode === "signin" && <button type="button" className="lb-auth-secondary-switch" onClick={() => { setAuthMode("signup"); setMessage(""); }}>Sign up</button>}</p>
         <p className="auth-legal">By continuing, you agree to use LabBridge as an educational resource. It does not replace supervised clinical training.</p>
       </section>
     </LandingPage>
@@ -185,45 +229,24 @@ export default function Home() {
 
   const displayName = profile?.full_name || user.email?.split("@")[0] || "Learner";
   const firstName = displayName.split(" ")[0];
-  const myCourses = courses.filter((course) => enrolled.includes(course.id));
 
-  return (
-    <main className="app-shell" dir={language === "ar" ? "rtl" : "ltr"}>
-      <aside className="sidebar">
-        <a className="brand" href="#" aria-label="LabBridge Learn home"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>LEARN</small></span></a>
-        <div className="workspace-label">LEARNING SPACE</div>
-        <nav className="main-nav" aria-label="Main navigation">
-          <a className="nav-item active" href="#overview"><span className="nav-icon">▦</span> {t.overview}</a>
-          <a className="nav-item" href="/library"><span className="nav-icon">▣</span> Academic library</a>\n          <a className="nav-item" href="/progress"><span className="nav-icon">◴</span> Assessment progress</a>
-          <a className="nav-item" href="/virtual-lab"><span className="nav-icon">⚗</span> Virtual laboratory</a>
-          <a className="nav-item" href="/study-centre"><span className="nav-icon">▤</span> Study Centre</a>
-          <a className="nav-item" href="/exams"><span className="nav-icon">✎</span> Examination Centre</a>
-          <a className="nav-item" href="/community"><span className="nav-icon">◎</span> Student Community</a>
-          <a className="nav-item" href="/ai-tutor"><span className="nav-icon">✦</span> LabBridge AI Tutor</a>
-          <a className="nav-item" href="/study-tools"><span className="nav-icon">✧</span> Personal Study Tools</a>
-          <a className="nav-item" href="/revision"><span className="nav-icon">⌕</span> Smart Revision & Question Bank</a>
-          <a className="nav-item" href="/certificates"><span className="nav-icon">✧</span> Certificates</a>\n          {canCreateAcademicContent && <a className="nav-item" href="/lecturer"><span className="nav-icon">✎</span> Lecturer Workspace</a>}
-          {canReviewAcademicContent && <a className="nav-item" href="/academic-review"><span className="nav-icon">✓</span> Academic Review Centre</a>}
-          <a className="nav-item" href="#courses"><span className="nav-icon">▤</span> {t.myCourses}</a>
-          <a className="nav-item" href="#resources"><span className="nav-icon">▧</span> {t.studyResources}</a>
-          <a className="nav-item" href="/progress"><span className="nav-icon">◎</span> {t.practiceQuizzes}</a>
-        </nav>
-        <div className="sidebar-bottom"><div className="help-card"><div className="help-symbol">✦</div><strong>Keep your momentum</strong><p>Small study sessions add up. Make today count.</p><a href="#courses">Explore learning ↗</a></div><div className="sidebar-footer"><span className="status-dot"/> Your learning space <span>{countries.find((item) => item.code === countryCode)?.name || "Global"}</span></div></div>
-      </aside>
-      <section className="main-area" id="overview">
-        <header className="topbar"><div className="breadcrumb">LabBridge <span>/</span> <strong>Overview</strong></div><div className="top-actions"><label className="top-preference"><span>{t.language}</span><select value={language} onChange={(e) => void savePreferences(e.target.value as SupportedLocale, countryCode)}><option value="en">EN</option><option value="fr">FR</option><option value="pt">PT</option><option value="ar">AR</option><option value="sw">SW</option><option value="es">ES</option></select></label><label className="top-preference country-preference"><span>{t.country}</span><select value={countryCode} onChange={(e) => void savePreferences(language, e.target.value)}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><span className="plan-pill">{planCode.toUpperCase()}</span><span className="welcome-label">{user.email}</span><div className="avatar">{displayName.split(" ").map((part) => part[0]).slice(0,2).join("").toUpperCase()}</div><button className="signout-button" onClick={signOut}>{t.signOut}</button></div></header>
-        <div className="content">
-          <section className="welcome-row"><div><div className="eyebrow"><span className="eyebrow-line"/> YOUR MLS LEARNING JOURNEY</div><h1>{t.welcome}, {firstName}.<br/><em>{t.keepGrowing}</em></h1><p className="intro">{t.journeyIntro}</p></div><div className="welcome-art" aria-hidden="true"><div className="art-orbit orbit-one"/><div className="art-orbit orbit-two"/><div className="art-cross">+</div><div className="art-core"><span>LAB</span><strong>✳</strong><span>LEARN</span></div><div className="art-dot dot-one"/><div className="art-dot dot-two"/><div className="art-dot dot-three"/></div></section>
-          <section className="stats-grid" aria-label="Learning summary"><div className="stat-card"><span className="stat-icon green">▤</span><div><strong>{myCourses.length.toString().padStart(2,"0")}</strong><span>{t.coursesEnrolled}</span></div><small>LIVE</small></div><div className="stat-card"><span className="stat-icon violet">◷</span><div><strong>{completedLessons.toString().padStart(2,"0")}</strong><span>{t.lessonsCompleted}</span></div><small>PROGRESS</small></div><div className="stat-card"><span className="stat-icon amber">✧</span><div><strong>{courses.length.toString().padStart(2,"0")}</strong><span>{t.publishedCourses}</span></div><small>AVAILABLE</small></div></section>
-          <section className="dashboard-tools" aria-label="Learning tools"><div className="section-heading"><div><div className="eyebrow">YOUR LEARNING WORKSPACE</div><h2>Choose your next step</h2></div></div><div className="dashboard-tools-grid"><a href="/study-centre"><span>▤</span><strong>Study Centre</strong><small>Notes and revision resources</small></a><a href="/exams"><span>✎</span><strong>Examination Centre</strong><small>Practice published assessments</small></a><a href="/community"><span>◎</span><strong>Student Community</strong><small>Discuss and learn together</small></a><a href="/virtual-lab"><span>⚗</span><strong>Virtual Laboratory</strong><small>Build practical judgement</small></a></div></section>
-          <section className="section-block" id="courses"><div className="section-heading"><div><div className="eyebrow">{t.nextStep}</div><h2>{myCourses.length ? t.yourPaths : t.explorePaths}</h2></div><span className="text-link">{courses.length} {t.coursesAvailable}</span></div>
-            {courses.length === 0 ? <div className="empty-state"><span>✳</span><h3>{t.libraryPreparing}</h3><p>{t.libraryDescription}</p></div> : <div className="course-grid">{courses.map((course) => <article className="course-card" key={course.id}><div className="course-top"><span className="course-icon mint">✳</span><span className="course-code">{course.level || course.discipline}</span></div><h3>{course.title}</h3><p>{course.description || "Build your knowledge with guided lessons and practical learning resources."}</p><div className="course-meta"><span>{course.discipline}</span><strong>{enrolled.includes(course.id) ? "ENROLLED" : "READY TO START"}</strong></div><div className="progress-track"><span style={{width: enrolled.includes(course.id) ? "8%" : "0%"}}/></div>{enrolled.includes(course.id) ? <a className="course-link" href={"/courses/" + course.slug}>Open course <span>↗</span></a> : <button className="course-link" disabled={busy} onClick={() => enroll(course.id)}>Enrol in course <span>↗</span></button>}</article>)}</div>}
-          </section>
-          {message && <p className="dashboard-message" role="status">{message}</p>}
-          <section className="lower-grid" id="resources"><div className="resource-panel"><div className="section-heading compact"><div><div className="eyebrow">YOUR LEARNING TOOLS</div><h2>{t.exploreExperience}</h2></div></div><div className="topic-list"><div className="topic-row"><span className="topic-number">01</span><span className="topic-copy"><strong>{t.visualLessons}</strong><small>{t.visualDescription}</small></span><span className="topic-arrow">→</span></div><div className="topic-row"><span className="topic-number">02</span><span className="topic-copy"><strong>{t.virtualLab}</strong><small>{t.virtualDescription}</small></span><span className="topic-arrow">→</span></div><div className="topic-row"><span className="topic-number">03</span><span className="topic-copy"><strong>{t.aiAssistant}</strong><small>{t.aiDescription}</small></span><span className="topic-arrow">→</span></div></div></div><aside className="quote-panel" id="practice"><div className="quote-mark">“</div><p>Every accurate result begins with a curious mind and a careful process.</p><div className="quote-rule"/><span>THE LABBRIDGE MINDSET</span><div className="quote-decoration">✳</div></aside></section>
-          <footer className="page-footer"><span>© 2026 LabBridge Learn</span><span>Built for the next generation of laboratory professionals <b>✦</b></span></footer>
-        </div>
-      </section>
-    </main>
-  );
+  return <StudentDashboard
+    firstName={firstName}
+    email={user.email || ""}
+    planCode={planCode}
+    language={language}
+    countryCode={countryCode}
+    countries={countries}
+    courses={courses}
+    enrolled={enrolled}
+    completedLessons={completedLessons}
+    overallProgress={overallProgress}
+    courseProgress={courseProgress}
+    recentActivity={recentActivity}
+    canCreateAcademicContent={canCreateAcademicContent}
+    canReviewAcademicContent={canReviewAcademicContent}
+    onLanguageChange={(value) => void savePreferences(value, countryCode)}
+    onCountryChange={(value) => void savePreferences(language, value)}
+    onSignOut={signOut}
+  />;
 }
