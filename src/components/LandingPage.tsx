@@ -126,7 +126,7 @@ export default function LandingPage({ language, languageControls, children }: La
       </section>
 
       <section className="lb-curriculum-section" id="curriculum">
-        <div className="lb-section-heading"><div><div className="lb-section-label">04 / YOUR ACADEMIC PATHWAY</div><h2>A clearer path through<br /><em>Medical Laboratory Science.</em></h2></div><p>Explore a structured learning journey that follows key stages of MLS study. Subject coverage can be adapted to your institution's approved curriculum.</p></div>
+        <div className="lb-section-heading"><div><div className="lb-section-label">04 / YOUR ACADEMIC PATHWAY</div><h2>A clearer path through<br /><em>Medical Laboratory Science.</em></h2></div><p>Explore a structured learning journey that follows key stages of MLS study. Subject coverage can be adapted to your institution&apos;s approved curriculum.</p></div>
         <div className="lb-level-grid">{levels.map((item) => <article key={item.level}><span>LEVEL</span><strong>{item.level}</strong><h3>{item.title}</h3><p>{item.subjects}</p></article>)}</div>
       </section>
 
