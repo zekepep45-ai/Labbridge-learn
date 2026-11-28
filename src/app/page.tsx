@@ -186,14 +186,6 @@ export default function Home() {
     if (error) setMessage("Your preference could not be saved: " + error.message);
   }
 
-  async function enroll(courseId: string) {
-    if (!user) return;
-    setBusy(true); setMessage("");
-    const { error } = await supabase.from("enrollments").insert({ user_id: user.id, course_id: courseId });
-    if (error && error.code !== "23505") setMessage(error.message);
-    else { setEnrolled((current) => [...current, courseId]); setMessage("You're enrolled. Your learning journey starts now."); }
-    setBusy(false);
-  }
 
   async function signOut() {
     await supabase.auth.signOut();
