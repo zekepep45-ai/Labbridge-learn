@@ -88,7 +88,6 @@ export default function Home() {
     setPlanCode(activePlan || "free");
     setCourses(courseData ?? []);
     setEnrolled((enrollmentData ?? []).map((item) => item.course_id));
-    setCompletedLessons((progressData ?? []).filter((item) => item.completion_percent >= 100).length);
     const moduleCourse = new Map((moduleData ?? []).map((item) => [item.id, item.course_id]));
     const lessonCourse = new Map((lessonData ?? []).map((item) => [item.id, moduleCourse.get(item.module_id)]));
     const lessonById = new Map((lessonData ?? []).map((item) => [item.id, item]));
@@ -96,6 +95,7 @@ export default function Home() {
     const nextCourseProgress: Record<string, { percent: number; completed: number; total: number; nextLesson: string | null }> = {};
     let totalLessonCount = 0;
     let totalPercent = 0;
+    const enrolledIds = new Set((enrollmentData ?? []).map((item) => item.course_id));
     for (const course of (courseData ?? [])) {
       const courseLessons = (lessonData ?? []).filter((lesson) => moduleCourse.get(lesson.module_id) === course.id);
       const courseRows = courseLessons.map((lesson) => progressByLesson.get(lesson.id));
@@ -103,10 +103,13 @@ export default function Home() {
       const percent = courseLessons.length ? Math.round(courseRows.reduce((sum, item) => sum + (item?.completion_percent ?? 0), 0) / courseLessons.length) : 0;
       const nextLesson = courseLessons.find((lesson) => (progressByLesson.get(lesson.id)?.completion_percent ?? 0) < 100)?.title ?? null;
       nextCourseProgress[course.id] = { percent, completed, total: courseLessons.length, nextLesson };
-      totalLessonCount += courseLessons.length;
-      totalPercent += courseLessons.reduce((sum, lesson) => sum + (progressByLesson.get(lesson.id)?.completion_percent ?? 0), 0);
+      if (enrolledIds.has(course.id)) {
+        totalLessonCount += courseLessons.length;
+        totalPercent += courseLessons.reduce((sum, lesson) => sum + (progressByLesson.get(lesson.id)?.completion_percent ?? 0), 0);
+      }
     }
     setCourseProgress(nextCourseProgress);
+    setCompletedLessons([...enrolledIds].reduce((sum, id) => sum + (nextCourseProgress[id]?.completed ?? 0), 0));
     setOverallProgress(totalLessonCount ? Math.round(totalPercent / totalLessonCount) : 0);
     const courseTitleById = new Map((courseData ?? []).map((course) => [course.id, course.title]));
     const activity = (progressData ?? []).filter((item) => item.last_accessed_at && lessonById.has(item.lesson_id)).sort((a, b) => new Date(b.last_accessed_at).getTime() - new Date(a.last_accessed_at).getTime()).slice(0, 4).map((item) => {
