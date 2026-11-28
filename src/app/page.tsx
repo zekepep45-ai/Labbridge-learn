@@ -115,7 +115,7 @@ export default function Home() {
     const activity = (progressData ?? []).filter((item) => item.last_accessed_at && lessonById.has(item.lesson_id)).sort((a, b) => new Date(b.last_accessed_at).getTime() - new Date(a.last_accessed_at).getTime()).slice(0, 4).map((item) => {
       const lesson = lessonById.get(item.lesson_id)!;
       const courseId = lessonCourse.get(item.lesson_id);
-      return { title: lesson.title, courseTitle: courseTitleById.get(courseId) || "MLS learning", lastAccessedAt: item.last_accessed_at, percent: item.completion_percent };
+      return { title: lesson.title, courseTitle: courseTitleById.get(courseId || "") || "MLS learning", lastAccessedAt: item.last_accessed_at, percent: item.completion_percent };
     });
     setRecentActivity(activity);
   }
