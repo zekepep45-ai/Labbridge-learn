@@ -221,7 +221,7 @@ export default function Home() {
         </form>
         {message && <p className="auth-message" role="status">{message}</p>}
         {authMode === "signin" && <button type="button" className="lb-forgot-link" onClick={() => { setAuthMode("reset"); setMessage(""); }}>Forgot your password?</button>}
-        <p className="auth-switch">{authMode === "signin" ? "New to LabBridge?" : authMode === "signup" ? "Already have an account?" : "Remembered your password?"} <button type="button" onClick={() => { setAuthMode("signin"); setMessage(""); }}>{authMode === "signin" ? "Create an account" : "Back to sign in"}</button>{authMode === "signin" && <button type="button" className="lb-auth-secondary-switch" onClick={() => { setAuthMode("signup"); setMessage(""); }}>Sign up</button>}</p>
+        <p className="auth-switch">{authMode === "signin" ? "New to LabBridge?" : authMode === "signup" ? "Already have an account?" : "Remembered your password?"} <button type="button" onClick={() => { setAuthMode(authMode === "signin" ? "signup" : "signin"); setMessage(""); }}>{authMode === "signin" ? "Create an account" : "Back to sign in"}</button></p>
         <p className="auth-legal">By continuing, you agree to use LabBridge as an educational resource. It does not replace supervised clinical training.</p>
       </section>
     </LandingPage>
