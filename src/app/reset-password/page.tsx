@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
   }
 
   return <main className="lb-reset-page">
-    <a className="lb-reset-brand" href="/"><span>L<sup>+</sup></span><strong>LabBridge <small>LEARN</small></strong></a>
+    <Link className="lb-reset-brand" href="/"><span>L<sup>+</sup></span><strong>LabBridge <small>LEARN</small></strong></Link>
     <section className="lb-reset-card">
       <div className="lb-reset-kicker">ACCOUNT SECURITY</div>
       <h1>Choose a new password.</h1>
