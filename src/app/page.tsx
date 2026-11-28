@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import { getMessages, type SupportedLocale } from "@/lib/i18n";
+import LandingPage from "@/components/LandingPage";
 
 type Course = {
   id: string;
@@ -156,33 +157,30 @@ export default function Home() {
   if (loading) return <main className="loading-screen"><div className="loading-mark">L<span>+</span></div><p>Preparing your learning space…</p></main>;
 
   if (!user) return (
-    <main className="auth-page" dir={language === "ar" ? "rtl" : "ltr"}>
-      <div className="auth-brand"><span className="brand-mark">L<span>+</span></span><span className="brand-copy"><strong>LabBridge</strong><small>LEARN</small></span><div className="auth-preferences"><label>{t.language}<select value={language} onChange={(e) => { const value = e.target.value as SupportedLocale; preferenceChoice.current.language = value; setLanguage(value); }}><option value="en">English</option><option value="fr">Français</option><option value="pt">Português</option><option value="ar">العربية</option><option value="sw">Kiswahili</option><option value="es">Español</option></select></label><label>{t.country}<select value={countryCode} onChange={(e) => { preferenceChoice.current.countryCode = e.target.value; setCountryCode(e.target.value); }}>{countries.length ? countries.map((item) => <option key={item.code} value={item.code}>{item.name}</option>) : <option value="GH">Ghana</option>}</select></label></div></div>
-      <section className="auth-layout">
-        <div className="auth-story">
-          <div className="eyebrow"><span className="eyebrow-line" /> THE NEXT GENERATION OF MLS LEARNING</div>
-          <h1>Learn with purpose.<br/><em>Grow with confidence.</em></h1>
-          <p>A richer way to study Medical Laboratory Science — with trusted lessons, practical learning, visual explanations and a community built for your progress.</p>
-          <div className="auth-pill-row"><span>✳ Global curriculum pathways</span><span>◉ Visual learning</span><span>⌁ Learn at your pace</span></div>
-          <div className="auth-illustration"><div className="auth-orbit"/><div className="auth-orbit second"/><div className="auth-cell">✳</div><span className="float-tag tag-one">LEARN</span><span className="float-tag tag-two">PRACTISE</span><span className="float-tag tag-three">ADVANCE</span></div>
+    <LandingPage
+      language={language}
+      languageControls={
+        <div className="lb-language-controls">
+          <label>{t.language}<select aria-label={t.language} value={language} onChange={(e) => { const value = e.target.value as SupportedLocale; preferenceChoice.current.language = value; setLanguage(value); }}><option value="en">EN</option><option value="fr">FR</option><option value="pt">PT</option><option value="ar">AR</option><option value="sw">SW</option><option value="es">ES</option></select></label>
+          <label>{t.country}<select aria-label={t.country} value={countryCode} onChange={(e) => { preferenceChoice.current.countryCode = e.target.value; setCountryCode(e.target.value); }}>{countries.length ? countries.map((item) => <option key={item.code} value={item.code}>{item.name}</option>) : <option value="GH">Ghana</option>}</select></label>
         </div>
-        <div className="auth-card">
-          <div className="eyebrow">{authMode === "signin" ? "YOUR LEARNING SPACE" : "START YOUR JOURNEY"}</div>
-          <h2>{authMode === "signin" ? t.welcomeBack : t.createAccount}</h2>
-          <p className="auth-subtitle">{authMode === "signin" ? t.continueLearning : t.joinCommunity}</p>
-          <form onSubmit={handleAuth} className="auth-form">
-            {authMode === "signup" && <label>{t.fullName}<input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" required autoComplete="name"/></label>}
-            <label>{t.email}<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required autoComplete="email"/></label>
-            <label>{t.password}<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" minLength={8} required autoComplete={authMode === "signin" ? "current-password" : "new-password"}/></label>
-            <button className="primary-button" disabled={busy}>{busy ? "Please wait…" : authMode === "signin" ? t.signInToLabBridge + " →" : t.createAccount + " →"}</button>
-          </form>
-          {message && <p className="auth-message" role="status">{message}</p>}
-          <p className="auth-switch">{authMode === "signin" ? "New to LabBridge?" : "Already have an account?"} <button onClick={() => { setAuthMode(authMode === "signin" ? "signup" : "signin"); setMessage(""); }}>{authMode === "signin" ? "Create an account" : "Sign in"}</button></p>
-          <p className="auth-legal">By continuing, you agree to use LabBridge as an educational resource. It does not replace supervised clinical training.</p>
-        </div>
+      }
+    >
+      <section className="auth-card lb-auth-card">
+        <div className="eyebrow">{authMode === "signin" ? "YOUR LEARNING SPACE" : "START YOUR JOURNEY"}</div>
+        <h2>{authMode === "signin" ? t.welcomeBack : t.createAccount}</h2>
+        <p className="auth-subtitle">{authMode === "signin" ? t.continueLearning : t.joinCommunity}</p>
+        <form onSubmit={handleAuth} className="auth-form">
+          {authMode === "signup" && <label>{t.fullName}<input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" required autoComplete="name" /></label>}
+          <label>{t.email}<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required autoComplete="email" /></label>
+          <label>{t.password}<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" minLength={8} required autoComplete={authMode === "signin" ? "current-password" : "new-password"} /></label>
+          <button className="primary-button" disabled={busy}>{busy ? "Please wait…" : authMode === "signin" ? t.signInToLabBridge + " →" : t.createAccount + " →"}</button>
+        </form>
+        {message && <p className="auth-message" role="status">{message}</p>}
+        <p className="auth-switch">{authMode === "signin" ? "New to LabBridge?" : "Already have an account?"} <button onClick={() => { setAuthMode(authMode === "signin" ? "signup" : "signin"); setMessage(""); }}>{authMode === "signin" ? "Create an account" : "Sign in"}</button></p>
+        <p className="auth-legal">By continuing, you agree to use LabBridge as an educational resource. It does not replace supervised clinical training.</p>
       </section>
-      <footer className="auth-footer">© 2026 LabBridge Learn · Learn. Practise. Advance.</footer>
-    </main>
+    </LandingPage>
   );
 
   const displayName = profile?.full_name || user.email?.split("@")[0] || "Learner";
