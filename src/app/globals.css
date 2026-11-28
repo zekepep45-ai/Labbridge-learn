@@ -1047,3 +1047,13 @@ html[data-low-data="true"] [class*="art-orbit"],html[data-low-data="true"] [clas
 .lb-auth-card .auth-switch button{font-size:9px}
 .lb-reset-card input:focus{outline:3px solid #d8a447;outline-offset:1px;border-color:#087f75}
 @media(max-width:760px){.lb-auth-card .auth-switch{line-height:2.2}}
+
+/* Student dashboard and authentication refinements */
+.lb-password-field{display:flex;align-items:center;position:relative}
+.lb-password-field input{width:100%;padding-right:58px!important}
+.lb-password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#087f75;font:700 9px 'DM Sans',sans-serif;padding:7px;cursor:pointer}
+.lb-forgot-link{display:block;margin:12px 0 0 auto;border:0;background:none;color:#087f75;font:700 9px 'DM Sans',sans-serif;cursor:pointer}
+.lb-auth-card .auth-switch{display:flex;justify-content:center;align-items:center;gap:5px;flex-wrap:wrap}
+.lb-auth-card .auth-switch button{font-size:9px}
+.lb-reset-card input:focus{outline:3px solid #d8a447;outline-offset:1px;border-color:#087f75}
+@media(max-width:760px){.lb-auth-card .auth-switch{line-height:2.2}}
